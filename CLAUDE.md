@@ -4,19 +4,16 @@ Next.js 15 (app router) + Tailwind 3. Static, no backend. `npm run dev` to work,
 
 ## Design rules (keep these)
 
-The visual reference is Flip's landing page (fliptexts.com): white page, Inter, big regular-weight headlines with a gray second line, colored sentence-case eyebrows, colored icon bullets, phones on soft gray rounded panels.
+The design source of truth is the hand-built Figma in Ramp's design system: https://www.figma.com/design/Kxotrn3khEinOjHBZrZ6j6/Untitled (a ramp.com product page). Match its frame and structure:
 
-In-thread cards follow Flip's "proposed trade" card:
-- Off-white card with a faint vertical gradient, hairline border, 22px radius, soft shadow
-- Header in sentence case, 13px gray with a thin outline icon. Never all-caps eyebrows
-- Status as plain gray text. No tinted pill badges, no colored dots
-- Title 32px, weight 400. Rows: gray label, semibold dark value
-- Color only in small text (muted red for money at risk), never colored boxes or fills
-- Dark gradient pill button, with "Nothing is paid until you approve." under it
+- Header, split hero with the iPhone image, customer logo strip, tabbed showcase, bento cards, two three-card rows, dark stats band, CTA card, FAQ, email form, full dark footer
+- 1440 frame with 64px gutters, Arial, ink `#0c0a08`, muted `rgba(12,10,8,0.6)`, cards `#f4f2f0`, lines `#d2cecb`, dark `#1a1919`, lime `#e4f222`
+- Centered eyebrow (16px muted) over a 48px heading for every section
+- Figma assets live in `public/ramp/`. Do not redraw them
 
-The four hero panels are live iMessage threads (`components/hero-threads.tsx`), modeled on Flip's "Texts, first." card. They play as a relay, one panel at a time, never all four at once. The panels walk the Procure to Pay steps in order (ask, approve, pay, renew). Each panel's first exchange is on screen at load, and the timings (typing dots, bubble entrance, thread glide) were measured off fliptexts.com, so keep them unless you re-measure.
+Ramp Dock's own pieces go in the Figma's slots: the live threads (`components/thread.tsx`), the in-thread cards (`components/cards.tsx`) and the copy. The hero phone is the Figma's image with the live thread laid over its screen. The four steps in the showcase play one at a time, never all at once. Thread timings were measured off fliptexts.com, so keep them unless you re-measure.
 
-The avatar is a lime circle with Ramp's logo mark (`RampMark` in `components/phone.tsx`), used everywhere a truck icon used to be. Vendor and company names are fictional; do not use real supplier names.
+Phone UI uses the `font-ios` stack. In-thread cards: off-white with a hairline border, sentence-case gray header, 32px title, gray label and dark value rows, color only in small text.
 
 ## Copy rules
 
@@ -25,4 +22,4 @@ The avatar is a lime circle with Ramp's logo mark (`RampMark` in `components/pho
 - Lead with the value: "Buy, approve and pay for things by text." Every section after explains how or why, one step at a time
 - Ramp Dock is all of Ramp's Procure to Pay (Procurement, Accounts Payable, Vendor Management) over SMS, not a tool for one industry. Mix examples across offices, restaurants and job sites
 - Concrete over abstract: real numbers, real roles, real objects
-- Do not borrow Flip's wording. Match its look, not its lines
+- Do not borrow Flip's or Ramp's marketing lines. Write our own

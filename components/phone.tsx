@@ -34,7 +34,7 @@ export function Phone({
     <div
       role="img"
       aria-label={label}
-      className="relative flex h-[844px] w-[390px] flex-col overflow-hidden rounded-[56px] border-[10px] border-[#121212] bg-white text-[#111111] shadow-[0_30px_60px_-30px_rgba(16,19,26,0.35)]"
+      className="font-ios relative flex h-[844px] w-[390px] flex-col overflow-hidden rounded-[56px] border-[10px] border-[#121212] bg-white text-[#111111] shadow-[0_30px_60px_-30px_rgba(16,19,26,0.35)]"
     >
       <div className="absolute left-1/2 top-[10px] h-8 w-[110px] -translate-x-1/2 rounded-2xl bg-[#0a0a0a]" />
       <div className="flex flex-col items-center gap-1.5 px-4 pb-2.5 pt-[54px]">

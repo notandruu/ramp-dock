@@ -19,11 +19,13 @@ Open http://localhost:3000.
 
 ## Structure
 
-- `app/page.tsx`: the landing page, section by section (hero, one section per Procure to Pay step, built on Ramp, safe by design, opportunity, close)
-- `components/hero-threads.tsx`: the four animated hero threads, played one at a time
-- `components/phone.tsx`: the iPhone iMessage frame, bubbles, avatar, Ramp mark, and the delivery slip photo
+- `app/page.tsx`: the landing page, built on the Figma frame (header, hero, logos, how it works, bento, safe by design, built on Ramp, why text, CTA card, FAQ, footer)
+- `components/thread.tsx`: the live iMessage threads (hero phone and the four-step showcase, played one at a time)
+- `components/phone.tsx`: the iPhone frame, bubbles, avatar, Ramp mark, and the delivery slip photo
 - `components/cards.tsx`: the in-thread cards (purchase request, approval, delivery recorded, bill on hold, renewal)
-- `components/screens.tsx`: one demo screen per Procure to Pay step
+- `components/screens.tsx`: the receiving phone screen
+- `components/email-form.tsx`: the Figma's email form (no backend, it scrolls to the demo)
+- `public/ramp/`: assets exported from the Figma
 
 ## The demo story
 

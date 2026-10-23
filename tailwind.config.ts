@@ -5,14 +5,19 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        // The Figma (Ramp's design system, via html.to.design) sets everything in Arial.
+        sans: ["Arial", "Helvetica", "sans-serif"],
+        // Phone UI reads as iOS.
+        ios: ["-apple-system", "BlinkMacSystemFont", "SF Pro Text", "Inter", "system-ui", "sans-serif"],
         hand: ["Caveat", "cursive"],
       },
       colors: {
-        ink: "#10131a",
-        muted: "#6f727a",
-        panel: "#f3f4f6",
-        lime: "#DFF50A",
+        ink: "#0c0a08",
+        muted: "rgba(12, 10, 8, 0.6)",
+        panel: "#f4f2f0",
+        line: "#d2cecb",
+        night: "#1a1919",
+        lime: "#e4f222",
       },
     },
   },

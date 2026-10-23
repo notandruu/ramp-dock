@@ -11,8 +11,7 @@ html {
 body {
   background: #ffffff;
   color: #10131a;
-  font-family: "Inter", system-ui, sans-serif;
-  font-feature-settings: "cv11", "ss01";
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* Hero threads: message entrances and typing dots, timed to match Flip's. */
@@ -52,7 +51,34 @@ body {
   animation: hero-dot 1.2s ease-in-out infinite both;
 }
 
+/* Showcase steps: the active step's bar fills while its thread plays. */
+@keyframes step-progress {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.step-progress {
+  animation: step-progress linear both;
+}
+
+/* Customer logos drift left forever, like ramp.com's strip. */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee {
+  animation: marquee 60s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .marquee,
+  .step-progress,
   .hero-row-in,
   .hero-bubble-in,
   .hero-dot {
