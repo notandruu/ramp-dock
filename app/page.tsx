@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { HeroThreads, type HeroPanel } from "@/components/hero-threads";
 import { Avatar, Scaled } from "@/components/phone";
 import { ScreenCatch, ScreenHeadsUp, ScreenHold, ScreenRecap, ScreenWorkflow } from "@/components/screens";
 
@@ -59,34 +60,85 @@ function CtaButton({ children = "Text Ramp Dock" }: { children?: ReactNode }) {
 
 /* ---------- hero ---------- */
 
-const heroPanels = [
+const heroPanels: HeroPanel[] = [
   {
-    screen: <ScreenHeadsUp align="start" />,
-    icon: ICON.message,
-    color: "#34c759",
+    icon: <Icon d={ICON.message} color="#34c759" size={24} />,
     title: "Texts first.",
     body: "Ramp messages your crew on delivery day. No app, no login.",
+    label: "Ramp Dock texts the site foreman on delivery day. He replies with a photo of the ticket and Ramp logs 40 sheets.",
+    exchanges: [
+      [
+        { from: "them", text: "morning Marco. Ridgeline is dropping 40 sheets of 5/8 drywall at Elm St today" },
+        { from: "them", text: "snap the delivery ticket when the truck shows up. that's it" },
+        { from: "me", photo: "ticket" },
+        { from: "them", text: "got it. read 40 sheets off your ticket and logged it on PO 1042" },
+      ],
+      [
+        { from: "them", text: "Kestrel Ready Mix pours at Pine Ave at 9. 12 yards on the PO" },
+        { from: "me", text: "truck just left. ticket says 11.5" },
+        { from: "them", text: "logged 11.5 yards. I'll check it against their bill" },
+      ],
+    ],
   },
   {
-    screen: <ScreenCatch align="start" />,
-    icon: ICON.columns,
-    color: "#2f6fe4",
+    icon: <Icon d={ICON.columns} color="#2f6fe4" size={24} />,
     title: "Asks who was there.",
     body: "When an invoice doesn't match, it checks with whoever signed.",
+    label: "Ramp Dock tells the foreman the invoice says 45 sheets but his ticket says 40, and asks whether 5 more arrived.",
+    exchanges: [
+      [
+        { from: "them", text: "quick one. Ridgeline billed 45 sheets for this morning's drop" },
+        { from: "them", text: "your ticket says 40. did the other 5 show up after you signed?" },
+        { from: "me", text: "no only 40. rest comes next week" },
+        { from: "them", text: "that's all I needed. holding the bill. you're done" },
+      ],
+      [
+        { from: "them", text: "Kestrel billed 12 yards for the Pine Ave pour" },
+        { from: "them", text: "your ticket says 11.5. did the driver take the extra back?" },
+        { from: "me", text: "yeah half a yard went back on the truck" },
+        { from: "them", text: "perfect. asking them for an $85 credit" },
+      ],
+    ],
   },
   {
-    screen: <ScreenHold align="start" />,
-    icon: ICON.receipt,
-    color: "#a2453b",
+    icon: <Icon d={ICON.receipt} color="#a2453b" size={24} />,
     title: "Holds bad bills.",
     body: "Controllers approve the right amount with one reply.",
+    label: "The controller is asked to pay $1,900 for what arrived and hold $237.50. She replies 1 and the dispute goes out.",
+    exchanges: [
+      [
+        { from: "them", text: "caught one before it got paid. Ridgeline billed 45 sheets, Marco signed for 40" },
+        { from: "them", text: "reply 1 to pay $1,900 for what arrived and hold $237.50" },
+        { from: "me", text: "1" },
+        { from: "them", text: "done. $1,900 goes out Nov 3 and Ridgeline has the dispute with Marco's ticket" },
+      ],
+      [
+        { from: "them", text: "Kestrel billed $2,040 for 12 yards. 11.5 arrived" },
+        { from: "them", text: "reply 1 to pay $1,955 and request an $85 credit" },
+        { from: "me", text: "1" },
+        { from: "them", text: "done. credit request sent with the signed ticket" },
+      ],
+    ],
   },
   {
-    screen: <ScreenRecap align="start" />,
-    icon: ICON.calendar,
-    color: "#b07a1f",
+    icon: <Icon d={ICON.calendar} color="#b07a1f" size={24} />,
     title: "Weekly recaps.",
     body: "What it caught, and which vendors keep shorting you.",
+    label: "A Friday recap: $1,912 caught this week, and Ridgeline overbilled on 3 of their last 8 drops.",
+    exchanges: [
+      [
+        { from: "them", text: "your week in deliveries: $1,912 caught before it got paid" },
+        { from: "them", text: "Ridgeline overbilled on 3 of their last 8 drops" },
+        { from: "them", text: "flag it before their pricing renews?" },
+        { from: "me", text: "yes" },
+        { from: "them", text: "flagged. it's on your renewal review with all 3 tickets" },
+      ],
+      [
+        { from: "them", text: "your week in deliveries: 31 checked, 1 off, $85 credit requested" },
+        { from: "them", text: "Kestrel matched the ticket on 9 of their last 10 pours" },
+        { from: "me", text: "nice" },
+      ],
+    ],
   },
 ];
 
@@ -103,22 +155,7 @@ function Hero() {
         </div>
       </div>
 
-      <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-        {heroPanels.map((p) => (
-          <div key={p.title} className="flex flex-col gap-5">
-            <div className="flex h-[440px] justify-center overflow-hidden rounded-[32px] bg-gradient-to-b from-[#f4f5f7] to-[#eceef2] pt-12">
-              <Scaled scale={0.72}>{p.screen}</Scaled>
-            </div>
-            <div>
-              <div className="flex items-center gap-2.5 text-[22px] font-semibold tracking-[-0.01em] text-ink">
-                <Icon d={p.icon} color={p.color} size={24} />
-                {p.title}
-              </div>
-              <p className="mt-1.5 text-[18px] leading-[1.45] text-muted">{p.body}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+      <HeroThreads panels={heroPanels} />
     </section>
   );
 }

@@ -30,12 +30,9 @@ export function Avatar({ size = 56 }: { size?: number }) {
 /** An iPhone-style iMessage thread with Ramp Dock. 390 x 844, like an iPhone 14/15. */
 export function Phone({
   children,
-  align = "end",
   label,
 }: {
   children: ReactNode;
-  /** "end" anchors the thread to the bottom like a real chat; "start" shows the top of it. */
-  align?: "start" | "end";
   /** Accessible description of the whole screen. */
   label: string;
 }) {
@@ -50,13 +47,7 @@ export function Phone({
         <Avatar />
         <div className="rounded-full bg-[#f2f2f1] px-2.5 py-[3px] text-[13px] font-semibold">Ramp Dock</div>
       </div>
-      <div
-        className={`flex min-h-0 flex-1 flex-col gap-1.5 overflow-hidden px-3.5 py-3 ${
-          align === "end" ? "justify-end" : "justify-start"
-        }`}
-      >
-        {children}
-      </div>
+      <div className="flex min-h-0 flex-1 flex-col justify-end gap-1.5 overflow-hidden px-3.5 py-3">{children}</div>
       <div className="flex items-center gap-2 px-3 pb-[22px] pt-2">
         <div className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full bg-[#ececee]">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#55554f" strokeWidth={2.4} strokeLinecap="round">

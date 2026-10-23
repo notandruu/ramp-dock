@@ -7,9 +7,9 @@ import { BillOnHoldCard, DeliveryLoggedCard, RecapCard, TicketVsInvoiceCard, Wor
  */
 
 /** 1 · 7:02 AM: Ramp texts Marco first, he sends the ticket photo. */
-export function ScreenHeadsUp({ align = "end" }: { align?: "start" | "end" }) {
+export function ScreenHeadsUp() {
   return (
-    <Phone align={align} label="Ramp Dock texts the site foreman on delivery day. He replies with a photo of the ticket and Ramp logs 40 sheets.">
+    <Phone label="Ramp Dock texts the site foreman on delivery day. He replies with a photo of the ticket and Ramp logs 40 sheets.">
       <Stamp>Today 7:02 AM</Stamp>
       <Them>morning Marco. Ridgeline Lumber is dropping 40 sheets of 5/8 drywall at Elm St today</Them>
       <Them>snap the delivery ticket when the truck shows up. that&apos;s it</Them>
@@ -23,9 +23,9 @@ export function ScreenHeadsUp({ align = "end" }: { align?: "start" | "end" }) {
 }
 
 /** 2 · 2:16 PM: the invoice says 45. Ramp asks Marco, who saw the truck. */
-export function ScreenCatch({ align = "end" }: { align?: "start" | "end" }) {
+export function ScreenCatch() {
   return (
-    <Phone align={align} label="Ramp Dock shows the order, the delivery and the invoice side by side, then asks the foreman whether 5 more sheets arrived.">
+    <Phone label="Ramp Dock shows the order, the delivery and the invoice side by side, then asks the foreman whether 5 more sheets arrived.">
       <Them>got it. read 40 sheets off your ticket</Them>
       <Stamp>Today 2:16 PM</Stamp>
       <Them>quick one. Ridgeline just billed us for 45 sheets on this morning&apos;s drop</Them>
@@ -39,9 +39,9 @@ export function ScreenCatch({ align = "end" }: { align?: "start" | "end" }) {
 }
 
 /** 3 · 2:18 PM: Dana gets the bill already matched, explained and held. */
-export function ScreenHold({ align = "end" }: { align?: "start" | "end" }) {
+export function ScreenHold() {
   return (
-    <Phone align={align} label="The controller gets a card proposing to pay $1,900 for what arrived and hold $237.50. She replies 1 and the dispute goes out.">
+    <Phone label="The controller gets a card proposing to pay $1,900 for what arrived and hold $237.50. She replies 1 and the dispute goes out.">
       <Stamp>Today 2:18 PM</Stamp>
       <Them>caught one before it got paid. Marco confirmed only 40 sheets came</Them>
       <BillOnHoldCard />
@@ -53,9 +53,9 @@ export function ScreenHold({ align = "end" }: { align?: "start" | "end" }) {
 }
 
 /** 4 · 2:24 PM: one catch becomes a standing rule. */
-export function ScreenWorkflow({ align = "end" }: { align?: "start" | "end" }) {
+export function ScreenWorkflow() {
   return (
-    <Phone align={align} label="The controller asks Ramp Dock to do this for every order and it builds a workflow that runs on its own.">
+    <Phone label="The controller asks Ramp Dock to do this for every order and it builds a workflow that runs on its own.">
       <Stamp>Today 2:24 PM</Stamp>
       <Me>do this for every materials order from now on</Me>
       <Them>set it up. it runs on its own from now on</Them>
@@ -65,9 +65,9 @@ export function ScreenWorkflow({ align = "end" }: { align?: "start" | "end" }) {
 }
 
 /** 5 · Friday: the recap, with vendor delivery accuracy. */
-export function ScreenRecap({ align = "end" }: { align?: "start" | "end" }) {
+export function ScreenRecap() {
   return (
-    <Phone align={align} label="A Friday recap: $1,912 caught this week, and Ridgeline delivered as billed only 63 percent of the time.">
+    <Phone label="A Friday recap: $1,912 caught this week, and Ridgeline delivered as billed only 63 percent of the time.">
       <Stamp>Fri 4:00 PM</Stamp>
       <Them>your week in deliveries</Them>
       <RecapCard />

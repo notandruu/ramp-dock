@@ -14,3 +14,48 @@ body {
   font-family: "Inter", system-ui, sans-serif;
   font-feature-settings: "cv11", "ss01";
 }
+
+/* Hero threads: message entrances and typing dots, timed to match Flip's. */
+
+@keyframes hero-row-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes hero-bubble-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@keyframes hero-dot {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.hero-row-in {
+  animation: hero-row-in 200ms ease-out both;
+}
+
+.hero-bubble-in {
+  animation: hero-bubble-in 200ms ease-out both;
+}
+
+.hero-dot {
+  animation: hero-dot 1.2s ease-in-out infinite both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-row-in,
+  .hero-bubble-in,
+  .hero-dot {
+    animation: none;
+  }
+}

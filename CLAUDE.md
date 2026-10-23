@@ -14,6 +14,8 @@ In-thread cards follow Flip's "proposed trade" card:
 - Color only in small text (muted red for money at risk), never colored boxes or fills
 - Dark gradient pill button, with "Nothing is paid until you approve." under it
 
+The four hero panels are live iMessage threads (`components/hero-threads.tsx`), modeled on Flip's "Texts, first." card. They play as a relay, one panel at a time, never all four at once. Each panel's first exchange is on screen at load, and the timings (typing dots, bubble entrance, thread glide) were measured off fliptexts.com, so keep them unless you re-measure.
+
 The avatar is an original lime circle with a truck mark. Do not draw Ramp's logo. Vendor and company names are fictional; do not use real supplier names.
 
 ## Copy rules
