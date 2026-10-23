@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Ramp Dock: only pay for what was delivered",
+  title: "Ramp Dock: buy, approve and pay for things by text",
   description:
-    "Your crew texts a photo of the delivery slip, and Ramp checks it against the bill before paying.",
+    "Ramp's Procure to Pay in a text thread. Ask for what you need, approve it, check what arrived and handle renewals without opening the dashboard.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

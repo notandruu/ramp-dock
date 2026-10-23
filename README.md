@@ -1,10 +1,10 @@
 # Ramp Dock
 
-Every delivery, checked before it's paid.
+Buy, approve and pay for things by text.
 
-Ramp Dock is a hackathon concept for the Berkeley Business Society × Ramp hackathon: an SMS agent that brings Ramp's Procure to Pay products (Procurement, Accounts Payable, Vendor Management) to the people who receive deliveries in the field.
+Ramp Dock is a hackathon concept for the Berkeley Business Society × Ramp hackathon: an SMS agent that brings Ramp's Procure to Pay products (Procurement, Accounts Payable, Vendor Management) to the people who never open the dashboard.
 
-Ramp already lets employees text a photo of a lunch receipt. A $1,900 drywall delivery still needs someone to log into the web app to record what came off the truck, so most contractors fall back to matching only the PO and the invoice. Ramp Dock texts the site lead on delivery day, reads the photo of the signed ticket, and checks it against the PO and the invoice before anything is paid.
+Most people who ask for things, approve them and receive them aren't at a desk, so requests and approvals sit waiting in the web app. Ramp Dock moves each step into a text: ask for what you need in plain words, approve with a "yes", send a photo of the delivery slip, pay the right amount with "1", and hear about contract renewals before they charge you.
 
 This repo is the landing page that presents the concept, in the style of a consumer product launch page.
 
@@ -19,24 +19,26 @@ Open http://localhost:3000.
 
 ## Structure
 
-- `app/page.tsx`: the landing page, section by section (hero, five feature sections, built on Ramp, safe by design, opportunity, close)
-- `components/phone.tsx`: the iPhone iMessage frame, bubbles, avatar, and the handwritten ticket photo
-- `components/cards.tsx`: the in-thread rich cards (delivery logged, ticket vs invoice rings, bill on hold, workflow, weekly recap)
-- `components/screens.tsx`: the five demo screens that tell the story
+- `app/page.tsx`: the landing page, section by section (hero, one section per Procure to Pay step, built on Ramp, safe by design, opportunity, close)
+- `components/hero-threads.tsx`: the four animated hero threads, played one at a time
+- `components/phone.tsx`: the iPhone iMessage frame, bubbles, avatar, Ramp mark, and the delivery slip photo
+- `components/cards.tsx`: the in-thread cards (purchase request, approval, delivery recorded, bill on hold, renewal)
+- `components/screens.tsx`: one demo screen per Procure to Pay step
 
 ## The demo story
 
 | Who | Role |
 | --- | --- |
-| Hartwell Builders | 60-person commercial contractor, the Ramp customer |
-| Marco | Site foreman at the Elm St job, no Ramp login |
-| Dana | Controller |
-| Ridgeline Lumber | Vendor (fictional) |
+| Jordan | Designer who needs monitors, no Ramp login |
+| Priya | Design lead who approves |
+| Marco | Site lead receiving a drywall delivery, no Ramp login |
+| Dana | Controller who pays bills and owns renewals |
+| Northwind Supply, Ridgeline Lumber, Harbor Foods, Canvas Cloud | Vendors (fictional) |
 
-1. 7:02 AM: Ramp Dock texts Marco that 40 sheets of drywall arrive today. He sends a photo of the signed ticket and Ramp logs 40.
-2. 2:16 PM: Ridgeline invoices 45 sheets. Ramp asks Marco if 5 more came. He says no.
-3. 2:18 PM: Dana gets a card proposing to pay $1,900 for what arrived and hold $237.50. She replies 1.
-4. She turns it into a workflow that runs on every materials PO.
-5. Friday: a recap of what was caught, with delivery accuracy per vendor.
+1. Procurement: Jordan texts that they need 2 monitors. Ramp finds them for $598 and sends the request to Priya.
+2. Approvals: Priya gets the price and budget in a text and replies yes.
+3. Receiving: on delivery day Marco sends a photo of the slip and Ramp records 40 sheets.
+4. Accounts Payable: Ridgeline bills 45 sheets. Dana replies 1 to pay $1,900 for what arrived and dispute the rest.
+5. Vendor Management: Canvas Cloud renews in 14 days with 6 unused seats. Dana replies yes and Ramp asks for fewer.
 
 All numbers in the demo are illustrative. Ramp Dock is not affiliated with or endorsed by Ramp.

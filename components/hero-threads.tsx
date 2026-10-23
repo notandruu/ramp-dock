@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import { Avatar, TicketPhoto } from "./phone";
+import { Avatar } from "./phone";
 
 /*
  * The hero's four live iMessage threads, modeled on Flip's "Texts, first." card.
@@ -10,7 +10,7 @@ import { Avatar, TicketPhoto } from "./phone";
  * 200ms while scaling up from 0.96, and the whole thread glides up as a new row lands.
  */
 
-export type HeroMessage = { from: "them" | "me"; text?: string; photo?: "ticket" };
+export type HeroMessage = { from: "them" | "me"; text: string };
 
 export type HeroPanel = {
   title: string;
@@ -56,16 +56,6 @@ function Bubble({ row }: { row: Row }) {
 
   if (row.typing) return <Typing />;
 
-  if (row.photo === "ticket") {
-    // TicketPhoto is drawn for the 390px phone; shrink it to fit this one.
-    return (
-      <div className={`relative h-[123px] w-[105px] origin-bottom-right ${enter}`}>
-        <div className="absolute left-0 top-0 origin-top-left scale-[0.7]">
-          <TicketPhoto />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <span

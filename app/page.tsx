@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { HeroThreads, type HeroPanel } from "@/components/hero-threads";
 import { Avatar, RampMark, Scaled } from "@/components/phone";
-import { ScreenCatch, ScreenHeadsUp, ScreenHold, ScreenRecap, ScreenWorkflow } from "@/components/screens";
+import { ScreenApprove, ScreenHeadsUp, ScreenHold, ScreenRenewal, ScreenRequest } from "@/components/screens";
 
 /* ---------- small building blocks ---------- */
 
@@ -28,13 +28,10 @@ const ICON = {
   camera: "M4 8h3l2-3h6l2 3h3v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z",
   key: "M15 7a4 4 0 1 1-3.9 5H4v3h3v2h3v-2.1A4 4 0 0 1 15 7z",
   columns: "M4 20V10M10 20V4M16 20v-8M3 20h18",
-  question: "M4 5h16v11H9l-5 4zM10 9.2a2 2 0 1 1 2.6 1.9c-.4.2-.6.5-.6 1M12 14h.01",
   reply: "M9 14l-5-5 5-5M4 9h10a6 6 0 0 1 6 6v3",
   check: "M5 12.5l4.5 4.5L19 7.5",
   shield: "M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z",
   hand: "M8 13V5.5a1.5 1.5 0 0 1 3 0V12m0-6.5a1.5 1.5 0 0 1 3 0V12m0-5a1.5 1.5 0 0 1 3 0v7a7 7 0 0 1-12.4 4.5L3.5 14a1.6 1.6 0 0 1 2.6-1.8L8 14",
-  loop: "M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7",
-  bolt: "M13 3L5 13h6l-1 8 8-10h-6z",
   list: "M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01",
   dollar: "M12 3v18M16.5 7.5C16 6 14.3 5 12 5c-2.8 0-4.5 1.4-4.5 3.3 0 4.4 9 2.2 9 6.9 0 2-1.8 3.5-4.5 3.5-2.4 0-4.3-1.1-4.8-2.8",
   rings: "M12 21a9 9 0 1 1 0-18M12 16a4 4 0 1 1 0-8",
@@ -46,7 +43,7 @@ const ICON = {
 function CtaButton({ children = "See how it works" }: { children?: ReactNode }) {
   return (
     <a
-      href="#demo"
+      href="#request"
       className="inline-flex items-center gap-3 rounded-[22px] bg-[#1b1b1d] py-3 pl-3 pr-6 text-[17px] font-semibold text-white shadow-[0_10px_30px_-10px_rgba(0,0,0,0.45)] transition hover:bg-black"
     >
       <span className="flex h-9 w-9 items-center justify-center rounded-[11px] bg-[#34c759]">
@@ -59,83 +56,83 @@ function CtaButton({ children = "See how it works" }: { children?: ReactNode }) 
 
 /* ---------- hero ---------- */
 
+// One panel per step of Procure to Pay. The second exchange in each shows another kind of business.
 const heroPanels: HeroPanel[] = [
   {
     icon: <Icon d={ICON.message} color="#34c759" size={24} />,
-    title: "1. Ramp texts your crew.",
-    body: "On delivery day, the person on site gets a text and replies with a photo of the slip.",
-    label: "Ramp Dock texts the site foreman on delivery day. He replies with a photo of the slip and Ramp logs 40 sheets.",
+    title: "1. Ask for it.",
+    body: "Text what you need. Ramp finds the vendor, checks the budget and sends it for approval.",
+    label: "A designer texts that they need 2 monitors. Ramp Dock finds them for $598 and sends the request to the approver.",
     exchanges: [
       [
-        { from: "them", text: "morning Marco. Ridgeline is dropping 40 sheets of 5/8 drywall at Elm St today" },
-        { from: "them", text: "snap the delivery slip when the truck shows up. that's it" },
-        { from: "me", photo: "ticket" },
-        { from: "them", text: "got it. read 40 sheets off your slip and logged it on PO 1042" },
+        { from: "me", text: "need 2 monitors for the new designers, under $700" },
+        { from: "them", text: "found them at Northwind Supply. $598 for both, and it fits the design budget" },
+        { from: "them", text: "sent to Priya to approve. I'll text you when it's done" },
       ],
       [
-        { from: "them", text: "Kestrel Ready Mix pours at Pine Ave at 9. 12 yards on the PO" },
-        { from: "me", text: "truck just left. slip says 11.5" },
-        { from: "them", text: "logged 11.5 yards. I'll check it against their bill" },
+        { from: "me", text: "we're almost out of olive oil. order the usual" },
+        { from: "them", text: "6 cases from Harbor Foods, $312. same as last month" },
+        { from: "them", text: "it's under your $500 limit, so it's already approved. arrives tomorrow at 7am" },
       ],
     ],
   },
   {
-    icon: <Icon d={ICON.columns} color="#2f6fe4" size={24} />,
-    title: "2. It spots a wrong bill.",
-    body: "If the bill says 45 and the slip says 40, Ramp asks the person who signed.",
-    label: "Ramp Dock tells the foreman the bill says 45 sheets but his slip says 40, and asks whether 5 more arrived.",
+    icon: <Icon d={ICON.check} color="#2f6fe4" size={24} />,
+    title: "2. Approve it.",
+    body: "The approver gets a text with the price and the budget left. One reply approves it.",
+    label: "The design lead is asked to approve 2 monitors for $598. She replies yes and the order goes out.",
     exchanges: [
       [
-        { from: "them", text: "quick one. Ridgeline billed 45 sheets for this morning's drop" },
-        { from: "them", text: "your slip says 40. did the other 5 show up after you signed?" },
-        { from: "me", text: "no only 40. rest comes next week" },
-        { from: "them", text: "that's all I needed. holding the bill. you're done" },
+        { from: "them", text: "Jordan needs 2 monitors from Northwind Supply" },
+        { from: "them", text: "$598. the design budget has $2,140 left. reply yes to approve" },
+        { from: "me", text: "yes" },
+        { from: "them", text: "approved. order sent, arriving Thursday" },
       ],
       [
-        { from: "them", text: "Kestrel billed 12 yards for the Pine Ave pour" },
-        { from: "them", text: "your slip says 11.5. did the driver take the extra back?" },
-        { from: "me", text: "yeah half a yard went back on the truck" },
-        { from: "them", text: "perfect. asking them for an $85 credit" },
+        { from: "them", text: "Marco needs 40 sheets of drywall for Elm St" },
+        { from: "them", text: "$1,900 from Ridgeline Lumber. under the job budget. approve?" },
+        { from: "me", text: "yes" },
+        { from: "them", text: "done. Ridgeline delivers Monday" },
       ],
     ],
   },
   {
     icon: <Icon d={ICON.receipt} color="#a2453b" size={24} />,
-    title: "3. You pay the right amount.",
-    body: "The bill waits for you. Reply 1 to pay for what came and dispute the rest.",
-    label: "The controller is asked to pay $1,900 for what arrived and hold $237.50. She replies 1 and the dispute goes out.",
+    title: "3. Pay the right amount.",
+    body: "Ramp checks each bill against the order and what arrived, then asks before paying.",
+    label: "Ramp Dock finds a bill for 45 sheets when 40 arrived. The controller replies 1 to pay $1,900 and dispute the rest.",
     exchanges: [
       [
-        { from: "them", text: "caught one before it got paid. Ridgeline billed 45 sheets, Marco signed for 40" },
-        { from: "them", text: "reply 1 to pay $1,900 for what arrived and hold $237.50" },
+        { from: "them", text: "Ridgeline billed 45 sheets, but Marco's photo of the slip shows 40" },
+        { from: "them", text: "reply 1 to pay $1,900 for what arrived and dispute the other $237.50" },
         { from: "me", text: "1" },
-        { from: "them", text: "done. $1,900 goes out Nov 3 and Ridgeline has the dispute with Marco's slip" },
+        { from: "them", text: "done. $1,900 goes out Nov 3 and the dispute is sent with the photo" },
       ],
       [
-        { from: "them", text: "Kestrel billed $2,040 for 12 yards. 11.5 arrived" },
-        { from: "them", text: "reply 1 to pay $1,955 and request an $85 credit" },
+        { from: "them", text: "Northwind's bill matches the order, and Jordan says both monitors arrived" },
+        { from: "them", text: "reply 1 to pay $598 on the due date" },
         { from: "me", text: "1" },
-        { from: "them", text: "done. credit request sent with the signed slip" },
+        { from: "them", text: "scheduled for Nov 14" },
       ],
     ],
   },
   {
     icon: <Icon d={ICON.calendar} color="#b07a1f" size={24} />,
-    title: "4. You see who overbills.",
-    body: "Every Friday, a text with what was caught and which vendors keep billing too much.",
-    label: "A Friday recap: $1,912 caught this week, and Ridgeline overbilled on 3 of their last 8 drops.",
+    title: "4. Stay ahead of renewals.",
+    body: "A text before each contract renews, with what you actually use and what to ask for.",
+    label: "Ramp Dock texts that a software contract renews in 14 days with 6 unused seats. The controller replies yes to ask for fewer.",
     exchanges: [
       [
-        { from: "them", text: "your week in deliveries: $1,912 caught before it got paid" },
-        { from: "them", text: "Ridgeline overbilled on 3 of their last 8 drops" },
-        { from: "them", text: "flag it before their pricing renews?" },
+        { from: "them", text: "heads up. Canvas Cloud renews in 14 days for $18,000" },
+        { from: "them", text: "only 24 of your 30 seats are used. want me to ask for 24? saves $3,600 a year" },
         { from: "me", text: "yes" },
-        { from: "them", text: "flagged. it's on your renewal review with all 3 slips" },
+        { from: "them", text: "sent to their account rep. I'll text you when they answer" },
       ],
       [
-        { from: "them", text: "your week in deliveries: 31 checked, 1 off, $85 credit requested" },
-        { from: "them", text: "Kestrel matched the slip on 9 of their last 10 pours" },
-        { from: "me", text: "nice" },
+        { from: "them", text: "Ridgeline billed for more than they delivered on 3 of their last 8 orders" },
+        { from: "them", text: "their prices renew Dec 1. add this to the review?" },
+        { from: "me", text: "yes" },
+        { from: "them", text: "added, with all 3 delivery photos" },
       ],
     ],
   },
@@ -146,9 +143,10 @@ function Hero() {
     <section className="mx-auto max-w-[1280px] px-6 pb-24 pt-10 md:pt-14">
       <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
         <h1 className="max-w-[1000px] text-balance text-[44px] font-normal leading-[1.05] tracking-[-0.035em] text-ink md:text-[68px]">
-          Only pay for what was delivered.
-          <span className="mt-5 block max-w-[720px] text-[22px] leading-[1.35] tracking-[-0.015em] text-[#8b8f97] md:text-[28px]">
-            Your crew texts a photo of the delivery slip. Ramp checks it against the bill before paying.
+          Buy, approve and pay for things by text.
+          <span className="mt-5 block max-w-[760px] text-[22px] leading-[1.35] tracking-[-0.015em] text-[#8b8f97] md:text-[28px]">
+            Ramp Dock puts Ramp&apos;s Procure to Pay in a text thread. Anyone can ask for what they need, approve it and
+            pay the right amount without opening the dashboard.
           </span>
         </h1>
         <div className="shrink-0">
@@ -175,69 +173,69 @@ type Feature = {
 
 const features: Feature[] = [
   {
-    id: "demo",
-    eyebrow: "On delivery day",
+    id: "request",
+    eyebrow: "Procurement",
     color: "#c2346a",
-    title: <>Your crew sends one photo. That&apos;s it.</>,
-    body: "When a delivery is due, Ramp Dock texts the person on site. They take a photo of the signed delivery slip and send it back. Ramp reads it, handwriting included, and records what arrived.",
+    title: <>Ask for anything in one text.</>,
+    body: "Text Ramp Dock what you need, like you would a coworker. It picks a vendor you already use, checks the budget and your company's rules, and sends the request to the right approver. No forms.",
     bullets: [
-      { icon: ICON.bell, text: "A text when the truck is due" },
-      { icon: ICON.camera, text: "Reads handwritten slips" },
-      { icon: ICON.key, text: "No app or login for the crew" },
+      { icon: ICON.message, text: "Ask in plain words" },
+      { icon: ICON.shield, text: "Checks budget and company rules" },
+      { icon: ICON.reply, text: "Goes to the right approver" },
+    ],
+    screen: <ScreenRequest />,
+  },
+  {
+    id: "approve",
+    eyebrow: "Approvals",
+    color: "#2f6fe4",
+    title: <>Approve with one reply.</>,
+    body: "Approvers are usually busy and away from the dashboard, so requests sit and wait. Ramp Dock texts them what it is, what it costs and how much budget is left. They reply yes and it's done.",
+    bullets: [
+      { icon: ICON.list, text: "Price, budget and rules in one text" },
+      { icon: ICON.check, text: "Reply yes or no" },
+      { icon: ICON.key, text: "No login needed" },
+    ],
+    screen: <ScreenApprove />,
+  },
+  {
+    id: "receive",
+    eyebrow: "Receiving",
+    color: "#d9662b",
+    title: <>Whoever gets the delivery sends a photo.</>,
+    body: "When an order is due, Ramp Dock texts the person receiving it: a site lead, a chef or an office manager. They reply with a photo of the delivery slip, and Ramp records what actually arrived.",
+    bullets: [
+      { icon: ICON.bell, text: "A text on delivery day" },
+      { icon: ICON.camera, text: "Reads the slip, even handwriting" },
+      { icon: ICON.key, text: "No Ramp account for the receiver" },
     ],
     screen: <ScreenHeadsUp />,
   },
   {
-    id: "catch",
-    eyebrow: "When the bill is wrong",
-    color: "#2f6fe4",
-    title: <>Ramp asks the person who was there.</>,
-    body: "Later, the vendor's bill comes in. If it charges for more than the slip shows, Ramp texts the person who signed and asks what happened, while they still remember.",
-    bullets: [
-      { icon: ICON.columns, text: "Compares the order, the slip and the bill" },
-      { icon: ICON.question, text: "Asks one simple question" },
-      { icon: ICON.reply, text: "Answered in one reply" },
-    ],
-    screen: <ScreenCatch />,
-  },
-  {
-    id: "approve",
-    eyebrow: "Paying the bill",
+    id: "pay",
+    eyebrow: "Accounts Payable",
     color: "#3f8a4a",
-    title: <>You only pay for what arrived.</>,
-    body: "The person who approves payments gets the bill already checked, with the extra amount held back. One reply pays for what came and disputes the rest, with the photo attached as proof.",
+    title: <>Every bill is checked before it&apos;s paid.</>,
+    body: "When a bill comes in, Ramp matches it to the order and to what arrived. If it's right, one reply schedules the payment. If it asks for too much, you pay for what came and dispute the rest, with the photo as proof.",
     bullets: [
-      { icon: ICON.dollar, text: "Pays for what arrived" },
-      { icon: ICON.receipt, text: "Disputes the rest with proof" },
+      { icon: ICON.columns, text: "Checks the order, delivery and bill" },
+      { icon: ICON.dollar, text: "Pays only for what arrived" },
       { icon: ICON.hand, text: "Nothing is paid until you say yes" },
     ],
     screen: <ScreenHold />,
   },
   {
-    id: "workflows",
-    eyebrow: "Every order",
-    color: "#d9662b",
-    title: <>Set it up once. It checks every delivery.</>,
-    body: "Tell Ramp Dock to do this for all your material orders. It checks each one from then on, and you can see or stop any step.",
-    bullets: [
-      { icon: ICON.loop, text: "Checks every order automatically" },
-      { icon: ICON.bolt, text: "Starts on the delivery date" },
-      { icon: ICON.list, text: "See or stop any step" },
-    ],
-    screen: <ScreenWorkflow />,
-  },
-  {
-    id: "recaps",
-    eyebrow: "Every Friday",
+    id: "renew",
+    eyebrow: "Vendor Management",
     color: "#9a7a3a",
-    title: <>See which vendors bill you for too much.</>,
-    body: "Each Friday you get a text with how much was caught that week and how often each vendor delivered what they billed. You see it before it's time to renew their prices.",
+    title: <>Hear about renewals before they charge you.</>,
+    body: "Two weeks before a contract renews, Ramp Dock texts you the price, how much of it you actually use and what to ask for. Reply yes and it reaches out to the vendor for you.",
     bullets: [
-      { icon: ICON.dollar, text: "Money caught each week" },
-      { icon: ICON.rings, text: "How often each vendor gets it right" },
-      { icon: ICON.bell, text: "A heads-up before renewals" },
+      { icon: ICON.calendar, text: "A text before every renewal" },
+      { icon: ICON.rings, text: "Shows what you actually use" },
+      { icon: ICON.reply, text: "Asks the vendor for you" },
     ],
-    screen: <ScreenRecap />,
+    screen: <ScreenRenewal />,
   },
 ];
 
@@ -277,18 +275,18 @@ function FeatureSection({ f, flip }: { f: Feature; flip: boolean }) {
 const stack = [
   {
     name: "Procurement",
-    today: "Orders and delivery records, typed in by someone at a desk.",
-    dock: "Delivery records made from a photo the crew texts in. The crew needs no Ramp account.",
+    today: "Purchase requests and approvals, made in the dashboard.",
+    dock: "Ask for things and approve them by text. The person asking needs no Ramp account.",
   },
   {
     name: "Accounts Payable",
-    today: "Checks each bill against the order, if someone recorded what arrived.",
-    dock: "Checks every bill against what actually arrived. Wrong bills wait before they're paid.",
+    today: "Bills read, checked against the order and paid, by someone at a desk.",
+    dock: "Bills also checked against a photo of what arrived. Pay the right amount with one reply.",
   },
   {
     name: "Vendor Management",
-    today: "Contracts, renewal dates and price comparisons.",
-    dock: "How often each vendor delivers what they bill, shown before you renew.",
+    today: "Contracts, renewal dates and price comparisons, in the dashboard.",
+    dock: "A text before each renewal, with what you use and what to ask for.",
   },
 ];
 
@@ -298,8 +296,8 @@ function BuiltOnRamp() {
       <div className="max-w-[1000px]">
         <div className="text-[19px] font-medium text-[#6a4fd0]">Built on Ramp</div>
         <h2 className="mt-5 text-[40px] font-normal leading-[1.08] tracking-[-0.03em] text-ink md:text-[58px]">
-          Ramp already checks bills against orders.
-          <span className="block text-[#8b8f97]">Dock adds what actually showed up.</span>
+          This is Ramp&apos;s Procure to Pay.
+          <span className="block text-[#8b8f97]">Now it works by text.</span>
         </h2>
       </div>
       <div className="mt-14 grid grid-cols-1 gap-5 md:grid-cols-3">
@@ -327,18 +325,18 @@ function BuiltOnRamp() {
 const rules = [
   {
     icon: ICON.key,
-    title: "The crew is just a phone number",
-    body: "The project manager adds one phone number per job. No Ramp account, no app, no training.",
+    title: "Anyone can be a phone number",
+    body: "People who ask, approve or receive only need a phone number. No Ramp account, no app, no training.",
   },
   {
     icon: "ramp",
-    title: "The delivery date starts it",
-    body: "Ramp already knows when each order is due, so it knows who to text and when.",
+    title: "Ramp knows when to text",
+    body: "A new request, a delivery date, a bill or a renewal each texts the right person at the right time.",
   },
   {
     icon: ICON.shield,
-    title: "Payments still need a yes",
-    body: "A crew text only records what arrived. Money moves only when an approver says yes.",
+    title: "Your rules still apply",
+    body: "Same approvers, limits and policies as the dashboard, and every reply is saved in Ramp.",
   },
 ];
 
@@ -348,7 +346,7 @@ function Trust() {
       <div className="rounded-[40px] bg-[#111214] px-8 py-14 text-white md:px-16 md:py-20">
         <div className="text-[19px] font-medium text-lime">Safe by design</div>
         <h2 className="mt-5 max-w-[760px] text-[38px] font-normal leading-[1.1] tracking-[-0.03em] md:text-[54px]">
-          Texts record deliveries. They never move money.
+          The same Ramp rules, just by text.
         </h2>
         <div className="mt-14 grid grid-cols-1 gap-10 md:grid-cols-3">
           {rules.map((r) => (
@@ -373,9 +371,9 @@ function Trust() {
 /* ---------- opportunity ---------- */
 
 const stats = [
-  { value: "$2.2T", label: "Spent on US construction each year", source: "Census Bureau" },
-  { value: "940k", label: "Construction businesses with employees", source: "BLS, Q1 2025" },
-  { value: "4,000+", label: "Builders already using Ramp", source: "ramp.com/construction" },
+  { value: "80%", label: "Of workers don't sit at a desk", source: "Emergence Capital" },
+  { value: "98%", label: "Of texts get opened", source: "Gartner" },
+  { value: "50,000+", label: "Businesses already using Ramp", source: "ramp.com" },
   { value: "2.5%", label: "Of bills have a mistake, on average", source: "Medius benchmark" },
 ];
 
@@ -385,8 +383,8 @@ function Opportunity() {
       <div className="max-w-[1000px]">
         <div className="text-[19px] font-medium text-[#2f6fe4]">The opportunity</div>
         <h2 className="mt-5 text-[40px] font-normal leading-[1.08] tracking-[-0.03em] text-ink md:text-[58px]">
-          Builders still track deliveries on paper slips.
-          <span className="block text-[#8b8f97]">Restaurants and stores get deliveries every day too.</span>
+          Most people who buy and approve things aren&apos;t at a desk.
+          <span className="block text-[#8b8f97]">But they all read their texts.</span>
         </h2>
       </div>
       <div className="mt-14 grid grid-cols-2 gap-x-8 gap-y-12 border-t border-[#e7e7e4] pt-12 lg:grid-cols-4">
@@ -411,8 +409,8 @@ function Close() {
         <Avatar size={72} />
       </div>
       <h2 className="mx-auto mt-8 max-w-[1150px] text-balance text-[42px] font-normal leading-[1.06] tracking-[-0.035em] text-ink md:text-[68px]">
-        Only pay for what was delivered.
-        <span className="block text-[#8b8f97]">Ramp Dock checks every delivery before it&apos;s paid.</span>
+        Buy, approve and pay for things by text.
+        <span className="block text-[#8b8f97]">All of Ramp&apos;s Procure to Pay, no dashboard needed.</span>
       </h2>
       <div className="mt-10 flex justify-center">
         <CtaButton>See the demo</CtaButton>
@@ -440,10 +438,10 @@ function Nav() {
         Ramp Dock
       </div>
       <nav className="hidden gap-8 text-[15px] text-muted md:flex">
-        <a href="#demo" className="hover:text-ink">Delivery day</a>
-        <a href="#approve" className="hover:text-ink">Paying</a>
-        <a href="#workflows" className="hover:text-ink">Every order</a>
-        <a href="#recaps" className="hover:text-ink">Fridays</a>
+        <a href="#request" className="hover:text-ink">Requests</a>
+        <a href="#approve" className="hover:text-ink">Approvals</a>
+        <a href="#pay" className="hover:text-ink">Bills</a>
+        <a href="#renew" className="hover:text-ink">Renewals</a>
       </nav>
     </header>
   );

@@ -89,10 +89,6 @@ export function Me({ children }: { children: ReactNode }) {
   );
 }
 
-export function Read({ children }: { children: ReactNode }) {
-  return <div className="shrink-0 self-end pr-1 text-[11px] font-medium text-[#6b6b66]">{children}</div>;
-}
-
 /** The photo Marco sends: a signed, handwritten delivery ticket on a truck tailgate. */
 export function TicketPhoto() {
   return (
