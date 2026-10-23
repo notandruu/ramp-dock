@@ -260,11 +260,11 @@ export function WorkflowCard() {
       <div className="flex flex-col">
         <Step kind="When">a PO&apos;s delivery day starts</Step>
         <Connector />
-        <Step kind="Action">text the site lead for the ticket</Step>
+        <Step kind="Action">text the site lead for the slip</Step>
         <Connector />
         <Step kind="When">the vendor&apos;s invoice arrives</Step>
         <Connector />
-        <Step kind="Action">match order, ticket and invoice</Step>
+        <Step kind="Action">match order, slip and invoice</Step>
         <Connector />
         <Step kind="Action">off by 1%+? hold it, text Dana</Step>
       </div>

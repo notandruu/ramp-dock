@@ -21,5 +21,7 @@ The avatar is a lime circle with Ramp's logo mark (`RampMark` in `components/pho
 ## Copy rules
 
 - No em dashes
-- Concrete over abstract: real numbers, real roles, real objects (tickets, POs, invoices)
-- The pitch line: "Ramp already won the card swipe. Ramp Dock wins the delivery."
+- Plain words a five-year-old could follow. Not punchy, not clever, not abstract. Say "delivery slip" and "bill", not "ticket", "invoice", "PO" or "3-way match"
+- Lead with the value: "Only pay for what was delivered." Every section after explains how or why, one step at a time
+- Concrete over abstract: real numbers, real roles, real objects
+- Do not borrow Flip's wording. Match its look, not its lines

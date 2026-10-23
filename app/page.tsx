@@ -43,7 +43,7 @@ const ICON = {
   calendar: "M3.5 5h17v15h-17zM3.5 10h17M8 3v4M16 3v4",
 };
 
-function CtaButton({ children = "Text Ramp Dock" }: { children?: ReactNode }) {
+function CtaButton({ children = "See how it works" }: { children?: ReactNode }) {
   return (
     <a
       href="#demo"
@@ -62,38 +62,38 @@ function CtaButton({ children = "Text Ramp Dock" }: { children?: ReactNode }) {
 const heroPanels: HeroPanel[] = [
   {
     icon: <Icon d={ICON.message} color="#34c759" size={24} />,
-    title: "Texts first.",
-    body: "Ramp messages your crew on delivery day. No app, no login.",
-    label: "Ramp Dock texts the site foreman on delivery day. He replies with a photo of the ticket and Ramp logs 40 sheets.",
+    title: "1. Ramp texts your crew.",
+    body: "On delivery day, the person on site gets a text and replies with a photo of the slip.",
+    label: "Ramp Dock texts the site foreman on delivery day. He replies with a photo of the slip and Ramp logs 40 sheets.",
     exchanges: [
       [
         { from: "them", text: "morning Marco. Ridgeline is dropping 40 sheets of 5/8 drywall at Elm St today" },
-        { from: "them", text: "snap the delivery ticket when the truck shows up. that's it" },
+        { from: "them", text: "snap the delivery slip when the truck shows up. that's it" },
         { from: "me", photo: "ticket" },
-        { from: "them", text: "got it. read 40 sheets off your ticket and logged it on PO 1042" },
+        { from: "them", text: "got it. read 40 sheets off your slip and logged it on PO 1042" },
       ],
       [
         { from: "them", text: "Kestrel Ready Mix pours at Pine Ave at 9. 12 yards on the PO" },
-        { from: "me", text: "truck just left. ticket says 11.5" },
+        { from: "me", text: "truck just left. slip says 11.5" },
         { from: "them", text: "logged 11.5 yards. I'll check it against their bill" },
       ],
     ],
   },
   {
     icon: <Icon d={ICON.columns} color="#2f6fe4" size={24} />,
-    title: "Asks who was there.",
-    body: "When an invoice doesn't match, it checks with whoever signed.",
-    label: "Ramp Dock tells the foreman the invoice says 45 sheets but his ticket says 40, and asks whether 5 more arrived.",
+    title: "2. It spots a wrong bill.",
+    body: "If the bill says 45 and the slip says 40, Ramp asks the person who signed.",
+    label: "Ramp Dock tells the foreman the bill says 45 sheets but his slip says 40, and asks whether 5 more arrived.",
     exchanges: [
       [
         { from: "them", text: "quick one. Ridgeline billed 45 sheets for this morning's drop" },
-        { from: "them", text: "your ticket says 40. did the other 5 show up after you signed?" },
+        { from: "them", text: "your slip says 40. did the other 5 show up after you signed?" },
         { from: "me", text: "no only 40. rest comes next week" },
         { from: "them", text: "that's all I needed. holding the bill. you're done" },
       ],
       [
         { from: "them", text: "Kestrel billed 12 yards for the Pine Ave pour" },
-        { from: "them", text: "your ticket says 11.5. did the driver take the extra back?" },
+        { from: "them", text: "your slip says 11.5. did the driver take the extra back?" },
         { from: "me", text: "yeah half a yard went back on the truck" },
         { from: "them", text: "perfect. asking them for an $85 credit" },
       ],
@@ -101,28 +101,28 @@ const heroPanels: HeroPanel[] = [
   },
   {
     icon: <Icon d={ICON.receipt} color="#a2453b" size={24} />,
-    title: "Holds bad bills.",
-    body: "Controllers approve the right amount with one reply.",
+    title: "3. You pay the right amount.",
+    body: "The bill waits for you. Reply 1 to pay for what came and dispute the rest.",
     label: "The controller is asked to pay $1,900 for what arrived and hold $237.50. She replies 1 and the dispute goes out.",
     exchanges: [
       [
         { from: "them", text: "caught one before it got paid. Ridgeline billed 45 sheets, Marco signed for 40" },
         { from: "them", text: "reply 1 to pay $1,900 for what arrived and hold $237.50" },
         { from: "me", text: "1" },
-        { from: "them", text: "done. $1,900 goes out Nov 3 and Ridgeline has the dispute with Marco's ticket" },
+        { from: "them", text: "done. $1,900 goes out Nov 3 and Ridgeline has the dispute with Marco's slip" },
       ],
       [
         { from: "them", text: "Kestrel billed $2,040 for 12 yards. 11.5 arrived" },
         { from: "them", text: "reply 1 to pay $1,955 and request an $85 credit" },
         { from: "me", text: "1" },
-        { from: "them", text: "done. credit request sent with the signed ticket" },
+        { from: "them", text: "done. credit request sent with the signed slip" },
       ],
     ],
   },
   {
     icon: <Icon d={ICON.calendar} color="#b07a1f" size={24} />,
-    title: "Weekly recaps.",
-    body: "What it caught, and which vendors keep shorting you.",
+    title: "4. You see who overbills.",
+    body: "Every Friday, a text with what was caught and which vendors keep billing too much.",
     label: "A Friday recap: $1,912 caught this week, and Ridgeline overbilled on 3 of their last 8 drops.",
     exchanges: [
       [
@@ -130,11 +130,11 @@ const heroPanels: HeroPanel[] = [
         { from: "them", text: "Ridgeline overbilled on 3 of their last 8 drops" },
         { from: "them", text: "flag it before their pricing renews?" },
         { from: "me", text: "yes" },
-        { from: "them", text: "flagged. it's on your renewal review with all 3 tickets" },
+        { from: "them", text: "flagged. it's on your renewal review with all 3 slips" },
       ],
       [
         { from: "them", text: "your week in deliveries: 31 checked, 1 off, $85 credit requested" },
-        { from: "them", text: "Kestrel matched the ticket on 9 of their last 10 pours" },
+        { from: "them", text: "Kestrel matched the slip on 9 of their last 10 pours" },
         { from: "me", text: "nice" },
       ],
     ],
@@ -146,8 +146,10 @@ function Hero() {
     <section className="mx-auto max-w-[1280px] px-6 pb-24 pt-10 md:pt-14">
       <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
         <h1 className="max-w-[1000px] text-balance text-[44px] font-normal leading-[1.05] tracking-[-0.035em] text-ink md:text-[68px]">
-          Introducing Ramp Dock
-          <span className="block text-[#8b8f97]">Every delivery, checked before it&apos;s paid.</span>
+          Only pay for what was delivered.
+          <span className="mt-5 block max-w-[720px] text-[22px] leading-[1.35] tracking-[-0.015em] text-[#8b8f97] md:text-[28px]">
+            Your crew texts a photo of the delivery slip. Ramp checks it against the bill before paying.
+          </span>
         </h1>
         <div className="shrink-0">
           <CtaButton />
@@ -174,91 +176,66 @@ type Feature = {
 const features: Feature[] = [
   {
     id: "demo",
-    eyebrow: "Field crews",
+    eyebrow: "On delivery day",
     color: "#c2346a",
-    title: (
-      <>
-        Snap the ticket.
-        That&apos;s the whole job.
-      </>
-    ),
-    body: "On delivery day, Ramp Dock texts the site lead before the truck arrives. They reply with a photo of the signed ticket, and Ramp reads the handwriting into a receipt on the PO.",
+    title: <>Your crew sends one photo. That&apos;s it.</>,
+    body: "When a delivery is due, Ramp Dock texts the person on site. They take a photo of the signed delivery slip and send it back. Ramp reads it, handwriting included, and records what arrived.",
     bullets: [
-      { icon: ICON.bell, text: "Texts on delivery day" },
-      { icon: ICON.camera, text: "Reads handwritten tickets" },
-      { icon: ICON.key, text: "No app, no Ramp login" },
+      { icon: ICON.bell, text: "A text when the truck is due" },
+      { icon: ICON.camera, text: "Reads handwritten slips" },
+      { icon: ICON.key, text: "No app or login for the crew" },
     ],
     screen: <ScreenHeadsUp />,
   },
   {
     id: "catch",
-    eyebrow: "The catch",
+    eyebrow: "When the bill is wrong",
     color: "#2f6fe4",
-    title: (
-      <>
-        Ramp asks the one person
-        who saw the truck.
-      </>
-    ),
-    body: "When the invoice doesn't match what came off the truck, Ramp Dock checks with the crew first, while they still remember, instead of AP chasing it three weeks later.",
+    title: <>Ramp asks the person who was there.</>,
+    body: "Later, the vendor's bill comes in. If it charges for more than the slip shows, Ramp texts the person who signed and asks what happened, while they still remember.",
     bullets: [
-      { icon: ICON.columns, text: "Order, ticket and invoice, side by side" },
-      { icon: ICON.question, text: "Asks only what it needs" },
+      { icon: ICON.columns, text: "Compares the order, the slip and the bill" },
+      { icon: ICON.question, text: "Asks one simple question" },
       { icon: ICON.reply, text: "Answered in one reply" },
     ],
     screen: <ScreenCatch />,
   },
   {
     id: "approve",
-    eyebrow: "Approvals",
+    eyebrow: "Paying the bill",
     color: "#3f8a4a",
-    title: (
-      <>
-        Ramp does the checking.
-        You just say yes.
-      </>
-    ),
-    body: "Controllers get the bill already matched and explained, with the overbilled amount held back. One reply pays for what arrived and sends the dispute with the crew's photo attached.",
+    title: <>You only pay for what arrived.</>,
+    body: "The person who approves payments gets the bill already checked, with the extra amount held back. One reply pays for what came and disputes the rest, with the photo attached as proof.",
     bullets: [
       { icon: ICON.dollar, text: "Pays for what arrived" },
-      { icon: ICON.receipt, text: "Disputes the rest, with proof" },
-      { icon: ICON.hand, text: "Nothing paid until you approve" },
+      { icon: ICON.receipt, text: "Disputes the rest with proof" },
+      { icon: ICON.hand, text: "Nothing is paid until you say yes" },
     ],
     screen: <ScreenHold />,
   },
   {
     id: "workflows",
-    eyebrow: "Workflows",
+    eyebrow: "Every order",
     color: "#d9662b",
-    title: (
-      <>
-        Say it once. Every
-        delivery gets checked.
-      </>
-    ),
-    body: "Turn one catch into a rule. Ramp Dock builds the workflow, shows you every step, and runs it on every materials PO from then on.",
+    title: <>Set it up once. It checks every delivery.</>,
+    body: "Tell Ramp Dock to do this for all your material orders. It checks each one from then on, and you can see or stop any step.",
     bullets: [
-      { icon: ICON.loop, text: "Runs on its own" },
-      { icon: ICON.bolt, text: "Triggered by delivery day" },
-      { icon: ICON.list, text: "See and pause every step" },
+      { icon: ICON.loop, text: "Checks every order automatically" },
+      { icon: ICON.bolt, text: "Starts on the delivery date" },
+      { icon: ICON.list, text: "See or stop any step" },
     ],
     screen: <ScreenWorkflow />,
   },
   {
     id: "recaps",
-    eyebrow: "Recaps",
+    eyebrow: "Every Friday",
     color: "#9a7a3a",
-    title: (
-      <>
-        See which vendors deliver
-        what they bill.
-      </>
-    ),
-    body: "Every Friday, a recap of what Dock checked and caught, plus delivery accuracy for each vendor, built from real tickets and surfaced before their pricing renews.",
+    title: <>See which vendors bill you for too much.</>,
+    body: "Each Friday you get a text with how much was caught that week and how often each vendor delivered what they billed. You see it before it's time to renew their prices.",
     bullets: [
-      { icon: ICON.dollar, text: "Dollars caught, every week" },
-      { icon: ICON.rings, text: "Delivery accuracy per vendor" },
-      { icon: ICON.bell, text: "Flags before renewals" },
+      { icon: ICON.dollar, text: "Money caught each week" },
+      { icon: ICON.rings, text: "How often each vendor gets it right" },
+      { icon: ICON.bell, text: "A heads-up before renewals" },
     ],
     screen: <ScreenRecap />,
   },
@@ -300,18 +277,18 @@ function FeatureSection({ f, flip }: { f: Feature; flip: boolean }) {
 const stack = [
   {
     name: "Procurement",
-    today: "Requests, POs and item receipts, entered by someone at a desk.",
-    dock: "Item receipts created from a photo of the delivery ticket, by crews with no Ramp seat.",
+    today: "Orders and delivery records, typed in by someone at a desk.",
+    dock: "Delivery records made from a photo the crew texts in. The crew needs no Ramp account.",
   },
   {
     name: "Accounts Payable",
-    today: "OCR, AP agents and 3-way match, as long as someone logged the receipt.",
-    dock: "Every bill matched against what actually arrived. Mismatches held before payment.",
+    today: "Checks each bill against the order, if someone recorded what arrived.",
+    dock: "Checks every bill against what actually arrived. Wrong bills wait before they're paid.",
   },
   {
     name: "Vendor Management",
-    today: "Contracts, renewals and price benchmarks.",
-    dock: "Delivery accuracy per vendor, from real tickets, surfaced before renewals.",
+    today: "Contracts, renewal dates and price comparisons.",
+    dock: "How often each vendor delivers what they bill, shown before you renew.",
   },
 ];
 
@@ -321,8 +298,8 @@ function BuiltOnRamp() {
       <div className="max-w-[1000px]">
         <div className="text-[19px] font-medium text-[#6a4fd0]">Built on Ramp</div>
         <h2 className="mt-5 text-[40px] font-normal leading-[1.08] tracking-[-0.03em] text-ink md:text-[58px]">
-          Ramp already does the matching.
-          <span className="block text-[#8b8f97]">Dock gives it eyes on the ground.</span>
+          Ramp already checks bills against orders.
+          <span className="block text-[#8b8f97]">Dock adds what actually showed up.</span>
         </h2>
       </div>
       <div className="mt-14 grid grid-cols-1 gap-5 md:grid-cols-3">
@@ -350,18 +327,18 @@ function BuiltOnRamp() {
 const rules = [
   {
     icon: ICON.key,
-    title: "Receivers are just phone numbers",
-    body: "The PM assigns a number per job. No Ramp seat, no app, no training.",
+    title: "The crew is just a phone number",
+    body: "The project manager adds one phone number per job. No Ramp account, no app, no training.",
   },
   {
     icon: "ramp",
-    title: "Delivery day is the trigger",
-    body: "The PO's delivery date works like a card swipe does for expenses: Ramp knows who to text and when.",
+    title: "The delivery date starts it",
+    body: "Ramp already knows when each order is due, so it knows who to text and when.",
   },
   {
     icon: ICON.shield,
-    title: "A text never moves money",
-    body: "Crew texts only record what arrived. Payment still runs through Ramp's approvals.",
+    title: "Payments still need a yes",
+    body: "A crew text only records what arrived. Money moves only when an approver says yes.",
   },
 ];
 
@@ -371,7 +348,7 @@ function Trust() {
       <div className="rounded-[40px] bg-[#111214] px-8 py-14 text-white md:px-16 md:py-20">
         <div className="text-[19px] font-medium text-lime">Safe by design</div>
         <h2 className="mt-5 max-w-[760px] text-[38px] font-normal leading-[1.1] tracking-[-0.03em] md:text-[54px]">
-          Ramp&apos;s own SMS playbook, extended to Procure to Pay.
+          Texts record deliveries. They never move money.
         </h2>
         <div className="mt-14 grid grid-cols-1 gap-10 md:grid-cols-3">
           {rules.map((r) => (
@@ -396,10 +373,10 @@ function Trust() {
 /* ---------- opportunity ---------- */
 
 const stats = [
-  { value: "$2.2T", label: "US construction spending a year", source: "Census Bureau" },
-  { value: "940k", label: "Construction businesses with payroll", source: "BLS, Q1 2025" },
-  { value: "4,000+", label: "Contractors already on Ramp", source: "ramp.com/construction" },
-  { value: "2.5%", label: "Average AP invoice error rate", source: "Medius benchmark" },
+  { value: "$2.2T", label: "Spent on US construction each year", source: "Census Bureau" },
+  { value: "940k", label: "Construction businesses with employees", source: "BLS, Q1 2025" },
+  { value: "4,000+", label: "Builders already using Ramp", source: "ramp.com/construction" },
+  { value: "2.5%", label: "Of bills have a mistake, on average", source: "Medius benchmark" },
 ];
 
 function Opportunity() {
@@ -408,8 +385,8 @@ function Opportunity() {
       <div className="max-w-[1000px]">
         <div className="text-[19px] font-medium text-[#2f6fe4]">The opportunity</div>
         <h2 className="mt-5 text-[40px] font-normal leading-[1.08] tracking-[-0.03em] text-ink md:text-[58px]">
-          Construction still runs on carbon-copy tickets.
-          <span className="block text-[#8b8f97]">Restaurants get deliveries every day.</span>
+          Builders still track deliveries on paper slips.
+          <span className="block text-[#8b8f97]">Restaurants and stores get deliveries every day too.</span>
         </h2>
       </div>
       <div className="mt-14 grid grid-cols-2 gap-x-8 gap-y-12 border-t border-[#e7e7e4] pt-12 lg:grid-cols-4">
@@ -434,8 +411,8 @@ function Close() {
         <Avatar size={72} />
       </div>
       <h2 className="mx-auto mt-8 max-w-[1150px] text-balance text-[42px] font-normal leading-[1.06] tracking-[-0.035em] text-ink md:text-[68px]">
-        Ramp already won the card swipe.
-        <span className="block text-[#8b8f97]">Ramp Dock wins the delivery.</span>
+        Only pay for what was delivered.
+        <span className="block text-[#8b8f97]">Ramp Dock checks every delivery before it&apos;s paid.</span>
       </h2>
       <div className="mt-10 flex justify-center">
         <CtaButton>See the demo</CtaButton>
@@ -463,10 +440,10 @@ function Nav() {
         Ramp Dock
       </div>
       <nav className="hidden gap-8 text-[15px] text-muted md:flex">
-        <a href="#demo" className="hover:text-ink">Field crews</a>
-        <a href="#approve" className="hover:text-ink">Approvals</a>
-        <a href="#workflows" className="hover:text-ink">Workflows</a>
-        <a href="#recaps" className="hover:text-ink">Recaps</a>
+        <a href="#demo" className="hover:text-ink">Delivery day</a>
+        <a href="#approve" className="hover:text-ink">Paying</a>
+        <a href="#workflows" className="hover:text-ink">Every order</a>
+        <a href="#recaps" className="hover:text-ink">Fridays</a>
       </nav>
     </header>
   );

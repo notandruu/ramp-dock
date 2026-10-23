@@ -6,17 +6,17 @@ import { BillOnHoldCard, DeliveryLoggedCard, RecapCard, TicketVsInvoiceCard, Wor
  * Hartwell Builders (contractor) · Marco (site foreman) · Dana (controller) · Ridgeline Lumber (vendor)
  */
 
-/** 1 · 7:02 AM: Ramp texts Marco first, he sends the ticket photo. */
+/** 1 · 7:02 AM: Ramp texts Marco first, he sends the slip photo. */
 export function ScreenHeadsUp() {
   return (
-    <Phone label="Ramp Dock texts the site foreman on delivery day. He replies with a photo of the ticket and Ramp logs 40 sheets.">
+    <Phone label="Ramp Dock texts the site foreman on delivery day. He replies with a photo of the slip and Ramp logs 40 sheets.">
       <Stamp>Today 7:02 AM</Stamp>
       <Them>morning Marco. Ridgeline Lumber is dropping 40 sheets of 5/8 drywall at Elm St today</Them>
-      <Them>snap the delivery ticket when the truck shows up. that&apos;s it</Them>
+      <Them>snap the delivery slip when the truck shows up. that&apos;s it</Them>
       <Stamp>10:41 AM</Stamp>
       <TicketPhoto />
       <Me>here</Me>
-      <Them>got it. read 40 sheets off your ticket</Them>
+      <Them>got it. read 40 sheets off your slip</Them>
       <DeliveryLoggedCard />
     </Phone>
   );
@@ -26,7 +26,7 @@ export function ScreenHeadsUp() {
 export function ScreenCatch() {
   return (
     <Phone label="Ramp Dock shows the order, the delivery and the invoice side by side, then asks the foreman whether 5 more sheets arrived.">
-      <Them>got it. read 40 sheets off your ticket</Them>
+      <Them>got it. read 40 sheets off your slip</Them>
       <Stamp>Today 2:16 PM</Stamp>
       <Them>quick one. Ridgeline just billed us for 45 sheets on this morning&apos;s drop</Them>
       <TicketVsInvoiceCard />
@@ -47,7 +47,7 @@ export function ScreenHold() {
       <BillOnHoldCard />
       <Them>reply 1 to pay $1,900 for what arrived and dispute the other 5 sheets</Them>
       <Me>1</Me>
-      <Them>done. $1,900 goes out Nov 3, and Ridgeline has the dispute with Marco&apos;s ticket attached</Them>
+      <Them>done. $1,900 goes out Nov 3, and Ridgeline has the dispute with Marco&apos;s slip attached</Them>
     </Phone>
   );
 }
