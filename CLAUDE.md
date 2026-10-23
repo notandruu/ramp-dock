@@ -20,6 +20,7 @@ Phone UI uses the `font-ios` stack. In-thread cards: off-white with a hairline b
 - No em dashes
 - Plain words a five-year-old could follow. Not punchy, not clever, not abstract. Say "delivery slip" and "bill", not "ticket", "invoice", "PO" or "3-way match"
 - Lead with the value: "Buy, approve and pay for things by text." Every section after explains how or why, one step at a time
+- Positioning: Ramp already has text agents for Card & Expense (receipts, memos). Ramp Dock extends that to the other half of Ramp. Say "you already text Ramp your receipts, now...", never pitch texting as new to Ramp
 - Ramp Dock is all of Ramp's Procure to Pay (Procurement, Accounts Payable, Vendor Management) over SMS, not a tool for one industry. Mix examples across offices, restaurants and job sites
 - Concrete over abstract: real numbers, real roles, real objects
 - Do not borrow Flip's or Ramp's marketing lines. Write our own

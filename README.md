@@ -4,7 +4,7 @@ Buy, approve and pay for things by text.
 
 Ramp Dock is a hackathon concept for the Berkeley Business Society × Ramp hackathon: an SMS agent that brings Ramp's Procure to Pay products (Procurement, Accounts Payable, Vendor Management) to the people who never open the dashboard.
 
-Most people who ask for things, approve them and receive them aren't at a desk, so requests and approvals sit waiting in the web app. Ramp Dock moves each step into a text: ask for what you need in plain words, approve with a "yes", send a photo of the delivery slip, pay the right amount with "1", and hear about contract renewals before they charge you.
+Ramp already works over text for Card & Expense: employees text in receipts and Ramp matches them. Procure to Pay has no text experience yet. Most people who ask for things, approve them and receive them aren't at a desk, so requests and approvals sit waiting in the web app. Ramp Dock moves each step into a text: ask for what you need in plain words, approve with a "yes", send a photo of the delivery slip, pay the right amount with "1", and hear about contract renewals before they charge you.
 
 This repo is the landing page that presents the concept, in the style of a consumer product launch page.
 

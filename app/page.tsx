@@ -70,7 +70,8 @@ function Header() {
 
 /* ---------- hero ---------- */
 
-// One person running a small team, start to finish.
+// The thread opens on the text Ramp already sends for Card & Expense (from the Figma), then the new
+// Procure to Pay texts arrive in the same thread.
 const heroScript: Script = [
   [
     { from: "them", text: "Northwind delivered. Jordan signed for both monitors" },
@@ -95,6 +96,10 @@ const heroScript: Script = [
     { from: "them", text: "found them at Northwind Supply. $598 for both, and it fits the budget" },
     { from: "them", text: "it's under your limit, so it's approved. arriving Thursday" },
   ],
+  [
+    { from: "them", text: "$7.50 at Blue Bottle. receipt matched" },
+    { from: "them", text: "memo set to \"Weekly coffee with a colleague\". transaction is complete" },
+  ],
 ];
 
 function Hero() {
@@ -106,8 +111,8 @@ function Hero() {
           Buy, approve and pay for things by text.
         </h1>
         <p className="mt-4 max-w-[566px] text-[18px] leading-[24px] text-muted md:text-[20px] md:leading-[26px]">
-          Ramp&apos;s Procure to Pay in a text thread. Ask for what you need, approve it and pay the right amount without
-          opening the dashboard.
+          You already text Ramp your receipts. Now you can ask for what you need, approve it and pay bills the same way.
+          No dashboard, no login.
         </p>
         <EmailForm className="mt-8" />
         <a
@@ -121,7 +126,7 @@ function Hero() {
       <div className="lg:pt-6">
         <HeroPhone
           script={heroScript}
-          label="A Ramp text thread: a $598 bill that matches is scheduled, a renewal with unused seats is renegotiated, and a bill for more than arrived is disputed."
+          label="A Ramp text thread. It starts with a coffee receipt being matched, then shows the new texts: a $598 bill that matches is scheduled, a renewal with unused seats is renegotiated, and a bill for more than arrived is disputed."
         />
       </div>
     </section>
@@ -465,9 +470,9 @@ function BuiltOnRamp() {
     <section className={`${wrap} mt-24 md:mt-[216px]`}>
       <Eyebrow>Built on Ramp</Eyebrow>
       <H2>
-        This is Ramp&apos;s Procure to Pay.
+        Card &amp; Expense already works by text.
         <br />
-        Now it works by text.
+        Now Procure to Pay does too.
       </H2>
       <div className="mt-14 grid grid-cols-1 gap-x-4 gap-y-10 md:grid-cols-3">
         {products.map((p) => (
@@ -523,8 +528,8 @@ function CtaCard() {
       <div className="grid grid-cols-1 overflow-hidden rounded-[12px] bg-panel lg:h-[492px] lg:grid-cols-2">
         <div className="flex items-center px-6 py-12 md:px-[62px]">
           <p className="text-[28px] leading-[32px] text-black md:text-[32px]">
-            Ramp already runs your spend.
-            <span className="block text-[#6d6c6b]">Ramp Dock brings it to text.</span>
+            Your receipts already go to Ramp by text.
+            <span className="block text-[#6d6c6b]">Now your orders and bills can too.</span>
           </p>
         </div>
         <div className="relative h-[300px] lg:h-full">
@@ -542,7 +547,11 @@ function CtaCard() {
 const faqs = [
   {
     q: "What is Ramp Dock?",
-    a: "A text message assistant for Ramp's Procure to Pay. People ask for things, approve them, confirm deliveries and pay bills by replying to texts instead of logging into the dashboard.",
+    a: "Ramp's text messages, extended to buying and paying bills. People ask for things, approve them, confirm deliveries and pay bills by replying to texts instead of logging into the dashboard.",
+  },
+  {
+    q: "Doesn't Ramp already work over text?",
+    a: "Yes, for Card & Expense: employees text in receipts and Ramp matches them and fills in the memo. Ramp Dock brings that same experience to the other half of Ramp: Procurement, Accounts Payable and Vendor Management.",
   },
   {
     q: "Who is it for?",

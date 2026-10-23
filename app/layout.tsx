@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Ramp Dock: buy, approve and pay for things by text",
   description:
-    "Ramp's Procure to Pay in a text thread. Ask for what you need, approve it, check what arrived and handle renewals without opening the dashboard.",
+    "Ramp already works by text for receipts. Ramp Dock brings the same texts to buying and paying bills: ask, approve, check what arrived and handle renewals.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
