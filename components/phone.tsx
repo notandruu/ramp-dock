@@ -1,28 +1,22 @@
 import type { ReactNode } from "react";
 
-/** The Ramp Dock contact avatar: full-bleed lime circle with an original truck mark. */
+/** Ramp's logo mark, taken from the wordmark on ramp.com. Fills with the current text color. */
+export function RampMark({ size = 24 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="50.9 -1.6 20 19" fill="currentColor" aria-hidden="true">
+      <path d="M70.028 15.612v.07h-9.983v-.07c1.439-.82 2.432-1.654 3.327-2.526h4.1zm-2.473-13.11L65.027 0h-.074s.042 4.664-4.205 8.906c-4.156 4.15-9.046 4.16-9.046 4.16v.074l2.578 2.546s4.819.05 9.074-4.16c4.24-4.195 4.205-9.022 4.205-9.022z" />
+    </svg>
+  );
+}
+
+/** The Ramp Dock contact avatar: full-bleed lime circle with the Ramp mark. */
 export function Avatar({ size = 56 }: { size?: number }) {
   return (
     <div
-      className="flex items-center justify-center overflow-hidden rounded-full bg-lime"
+      className="flex items-center justify-center overflow-hidden rounded-full bg-lime text-[#111111]"
       style={{ width: size, height: size }}
     >
-      <svg
-        width={size * 0.54}
-        height={size * 0.54}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="#111111"
-        strokeWidth={1.9}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M3 6h11v10H3z" />
-        <path d="M14 10h4l3 3v3h-7" />
-        <circle cx="7" cy="17.5" r="1.8" />
-        <circle cx="17" cy="17.5" r="1.8" />
-      </svg>
+      <RampMark size={size * 0.56} />
     </div>
   );
 }

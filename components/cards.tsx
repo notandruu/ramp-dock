@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { RampMark } from "./phone";
 
 /*
  * In-thread rich cards, modeled on the "proposed trade" and rings cards in Flip:
@@ -92,14 +93,6 @@ const iconProps = {
   "aria-hidden": true,
 };
 
-const TruckIcon = () => (
-  <svg {...iconProps}>
-    <path d="M3 6h11v10H3z" />
-    <path d="M14 10h4l3 3v3h-7" />
-    <circle cx="7" cy="17.5" r="1.8" />
-    <circle cx="17" cy="17.5" r="1.8" />
-  </svg>
-);
 const ReceiptIcon = () => (
   <svg {...iconProps}>
     <path d="M6 3h12v18l-3-2-3 2-3-2-3 2z" />
@@ -123,7 +116,7 @@ const CalendarIcon = () => (
 export function DeliveryLoggedCard() {
   return (
     <Shell>
-      <Header icon={<TruckIcon />} title="Delivery logged" status="Matches PO" />
+      <Header icon={<RampMark size={16} />} title="Delivery logged" status="Matches PO" />
       <Title aside="PO #1042">40 sheets</Title>
       <Rows
         rows={[

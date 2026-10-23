@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { HeroThreads, type HeroPanel } from "@/components/hero-threads";
-import { Avatar, Scaled } from "@/components/phone";
+import { Avatar, RampMark, Scaled } from "@/components/phone";
 import { ScreenCatch, ScreenHeadsUp, ScreenHold, ScreenRecap, ScreenWorkflow } from "@/components/screens";
 
 /* ---------- small building blocks ---------- */
@@ -39,7 +39,6 @@ const ICON = {
   dollar: "M12 3v18M16.5 7.5C16 6 14.3 5 12 5c-2.8 0-4.5 1.4-4.5 3.3 0 4.4 9 2.2 9 6.9 0 2-1.8 3.5-4.5 3.5-2.4 0-4.3-1.1-4.8-2.8",
   rings: "M12 21a9 9 0 1 1 0-18M12 16a4 4 0 1 1 0-8",
   bell: "M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0",
-  truck: "M3 6h11v10H3zM14 10h4l3 3v3h-7M7 19.3a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6zM17 19.3a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6z",
   receipt: "M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6",
   calendar: "M3.5 5h17v15h-17zM3.5 10h17M8 3v4M16 3v4",
 };
@@ -355,7 +354,7 @@ const rules = [
     body: "The PM assigns a number per job. No Ramp seat, no app, no training.",
   },
   {
-    icon: ICON.truck,
+    icon: "ramp",
     title: "Delivery day is the trigger",
     body: "The PO's delivery date works like a card swipe does for expenses: Ramp knows who to text and when.",
   },
@@ -377,7 +376,13 @@ function Trust() {
         <div className="mt-14 grid grid-cols-1 gap-10 md:grid-cols-3">
           {rules.map((r) => (
             <div key={r.title}>
-              <Icon d={r.icon} color="#DFF50A" size={28} />
+              {r.icon === "ramp" ? (
+                <span className="text-lime">
+                  <RampMark size={28} />
+                </span>
+              ) : (
+                <Icon d={r.icon} color="#DFF50A" size={28} />
+              )}
               <div className="mt-5 text-[21px] font-medium tracking-[-0.01em]">{r.title}</div>
               <p className="mt-2 text-[17px] leading-[1.55] text-[#a6a8ad]">{r.body}</p>
             </div>
