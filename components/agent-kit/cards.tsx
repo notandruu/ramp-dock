@@ -135,60 +135,39 @@ export function PlanCard({ tile, title, steps = 3, children }: { tile: { label: 
 
 /* ---------- small, 158 square ---------- */
 
-/** What's left of a budget: a ring that draws round to what's been spent. */
-export function MeterWidget({ value, unit, caption, spent }: { value: string; unit?: string; caption: string; spent: number }) {
-  const r = 22;
+/** What's left of a budget, like a fuel gauge: gray title, the amount left, a bar showing how much of it remains. */
+export function MeterWidget({ title, value, left, note }: { title: string; value: string; left: number; note: string }) {
   return (
     <Card width={158} height={158} radius={14.5}>
-      <svg width="58" height="58" viewBox="0 0 58 58" style={{ position: "absolute", right: 16, top: 16 }} aria-hidden="true">
-        <defs>
-          <linearGradient id="meter-g" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#6aa9fa" />
-            <stop offset="1" stopColor="#a8ccfb" />
-          </linearGradient>
-        </defs>
-        <circle cx="29" cy="29" r={r} fill="none" stroke={TRACK} strokeWidth="7" />
-        <circle
-          data-cue="draw"
-          data-draw={spent}
-          cx="29"
-          cy="29"
-          r={r}
-          fill="none"
-          stroke="url(#meter-g)"
-          strokeWidth="7"
-          strokeLinecap="round"
-          pathLength={1}
-          strokeDasharray={`${spent} 1`}
-          transform="rotate(-90 29 29)"
-          style={{ strokeDashoffset: 0 }}
-        />
-      </svg>
-      <div style={{ position: "absolute", left: 20, top: 74, display: "flex", alignItems: "baseline", gap: 3, color: INK }}>
+      <div style={{ position: "absolute", left: 18, right: 18, top: 18, fontSize: 15, color: CAPTION, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</div>
+      <div style={{ position: "absolute", left: 18, top: 50, display: "flex", alignItems: "baseline", gap: 3 }}>
         <span style={big}>{value}</span>
-        {unit && <span style={{ fontSize: 16 }}>{unit}</span>}
+        <span style={{ fontSize: 16, color: INK }}>left</span>
       </div>
-      <div style={{ position: "absolute", left: 20, right: 12, top: 122, ...small, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{caption}</div>
+      <div style={{ position: "absolute", left: 18, right: 18, top: 110, display: "flex" }}>
+        <Bar amount={left} />
+      </div>
+      <div style={{ position: "absolute", left: 18, right: 18, top: 122, ...small, whiteSpace: "nowrap" }}>{note}</div>
     </Card>
   );
 }
 
-/** A count of things waiting on someone, as a stack of the people's initials. */
-export function WaitingWidget({ count, caption, people }: { count: string; caption: string; people: string[] }) {
+/** Things waiting on you: gray title, the count, and the faces of who's waiting, one after another. */
+export function WaitingWidget({ title, count, people }: { title: string; count: string; people: string[] }) {
   return (
     <Card width={158} height={158} radius={14.5}>
-      <div style={{ position: "absolute", right: 16, top: 18, display: "flex" }}>
-        {people.map((p, i) => (
-          <div key={p} data-cue="pop" style={{ marginLeft: i ? -10 : 0, borderRadius: 11, boxShadow: "0 0 0 2px #f7f7f7" }}>
-            <Initials size={34}>{p}</Initials>
+      <div style={{ position: "absolute", left: 18, right: 18, top: 18, fontSize: 15, color: CAPTION, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</div>
+      <div style={{ position: "absolute", left: 18, top: 50, display: "flex", alignItems: "baseline", gap: 3 }}>
+        <span style={big}>{count}</span>
+        <span style={{ fontSize: 16, color: INK }}>waiting</span>
+      </div>
+      <div style={{ position: "absolute", left: 18, top: 108, display: "flex", gap: 6 }}>
+        {people.map((p) => (
+          <div key={p} data-cue="pop">
+            <Initials size={30}>{p}</Initials>
           </div>
         ))}
       </div>
-      <div style={{ position: "absolute", left: 20, top: 74, display: "flex", alignItems: "baseline", gap: 3, color: INK }}>
-        <span style={big}>{count}</span>
-        <span style={{ fontSize: 16 }}>waiting</span>
-      </div>
-      <div style={{ position: "absolute", left: 20, right: 12, top: 122, ...small, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{caption}</div>
     </Card>
   );
 }
@@ -271,33 +250,47 @@ export function ChartCard({ title, total, note, weeks }: { title: string; total:
   );
 }
 
-function Doc({ label }: { label: string }) {
+/** A paper as a little tile: the same blue as the calendar's, with lines of writing on it. */
+function Paper() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-      <div style={{ width: 46, height: 56, borderRadius: 7, background: TILE_BLUE, boxShadow: "0 2px 4px rgba(40,90,160,0.22)", padding: "12px 9px", display: "flex", flexDirection: "column", gap: 5 }}>
-        {[1, 0.7, 0.85, 0.5].map((w, i) => (
-          <div key={i} style={{ height: 3, width: `${w * 100}%`, borderRadius: 2, background: "rgba(255,255,255,0.85)" }} />
-        ))}
-      </div>
-      <div style={small}>{label}</div>
+    <div style={{ width: 30, height: 38, flexShrink: 0, borderRadius: 6, background: TILE_BLUE, boxShadow: "0 1.5px 3px rgba(40,90,160,0.22)", padding: "9px 6px", display: "flex", flexDirection: "column", gap: 4 }}>
+      {[1, 0.65, 0.85].map((w, i) => (
+        <div key={i} style={{ height: 2.5, width: `${w * 100}%`, borderRadius: 2, background: "rgba(255,255,255,0.9)" }} />
+      ))}
     </div>
   );
 }
 
-/** Two papers that should agree, and a check that draws itself between them once they do. */
-export function MatchCard({ left, right, children }: { left: string; right: string; children: ReactNode }) {
+/**
+ * Two papers that should say the same thing, side by side with what each says, a check between them
+ * that draws itself once they agree, and what happens next underneath.
+ */
+export function MatchCard({ title, papers, children }: { title: string; papers: [[label: string, says: string], [label: string, says: string]]; children: ReactNode }) {
+  const paper = ([label, says]: [string, string]) => (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1 }}>
+      <Paper />
+      <div>
+        <div style={small}>{label}</div>
+        <div style={{ ...body, marginTop: 2 }}>{says}</div>
+      </div>
+    </div>
+  );
   return (
     <Card height={158}>
-      <div style={{ position: "absolute", right: 18, top: 18, display: "flex", alignItems: "flex-start", gap: 10 }}>
-        <Doc label={left} />
-        <svg width="34" height="34" viewBox="0 0 34 34" style={{ marginTop: 11 }} aria-hidden="true">
-          <circle cx="17" cy="17" r="16" fill="#eaf2fe" />
-          <path data-cue="draw" d="M10 17.5 L15 22.5 L24.5 12" fill="none" stroke="#5f9ff3" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray="1 1" style={{ strokeDashoffset: 0 }} />
+      <div style={{ position: "absolute", left: 18, top: 18, fontSize: 17, color: CAPTION }}>{title}</div>
+      <div style={{ position: "absolute", left: 18, right: 18, top: 52, display: "flex", alignItems: "center", gap: 8 }}>
+        {paper(papers[0])}
+        <svg width="26" height="26" viewBox="0 0 26 26" style={{ flexShrink: 0 }} aria-hidden="true">
+          <circle cx="13" cy="13" r="13" fill="#eaf2fe" />
+          <path data-cue="draw" d="M7.5 13.5 L11.5 17.5 L18.5 9.5" fill="none" stroke="#5f9ff3" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray="1 1" style={{ strokeDashoffset: 0 }} />
         </svg>
-        <Doc label={right} />
+        {paper(papers[1])}
       </div>
-      <div data-cue="row" style={{ position: "absolute", left: 18, width: 168, top: 20, ...body }}>
-        {children}
+      <div style={{ position: "absolute", left: 18, right: 18, top: 110 }}>
+        <Hairline />
+        <div data-cue="row" style={{ ...body, marginTop: 11 }}>
+          {children}
+        </div>
       </div>
     </Card>
   );

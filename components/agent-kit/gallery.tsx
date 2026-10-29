@@ -23,8 +23,8 @@ const SECTIONS: { title: string; items: Item[] }[] = [
       glyph("Approved: stamped", STAMP, "OK", undefined, "Laptop for Priya"),
       glyph("Delivered: box dropped in", BOX, "40", "sheets", "Drywall - Elm St"),
       glyph("On the way: truck pulls up", TRUCK, "10", "AM", "Ridgeline - Elm St"),
-      { name: "Budget left: ring draws to what's spent", card: <MeterWidget value="$240" unit="left" caption="Office snacks - May" spent={0.76} /> },
-      { name: "Waiting on you: faces pop in", card: <WaitingWidget count="3" caption="Approvals for you" people={["DK", "SR", "PL"]} /> },
+      { name: "Budget left: the bar fills to what's left", card: <MeterWidget title="Office snacks" value="$240" left={0.24} note="of $1,000 for May" /> },
+      { name: "Waiting on you: faces pop in", card: <WaitingWidget title="Approvals for you" count="3" people={["DK", "SR", "PL"]} /> },
     ],
   },
   {
@@ -41,8 +41,14 @@ const SECTIONS: { title: string; items: Item[] }[] = [
       {
         name: "Slip and bill agree: the check draws",
         card: (
-          <MatchCard left="Slip" right="Bill">
-            40 sheets <Dim>on</Dim> both<Dim>, so the bill gets paid</Dim> Friday<Dim>.</Dim>
+          <MatchCard
+            title="Drywall for Elm St"
+            papers={[
+              ["Delivery slip", "40 sheets"],
+              ["Bill", "40 sheets"],
+            ]}
+          >
+            They match<Dim>, so</Dim> $2,180 <Dim>gets paid</Dim> Friday<Dim>.</Dim>
           </MatchCard>
         ),
       },
