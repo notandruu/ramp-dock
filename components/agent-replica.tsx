@@ -11,7 +11,9 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
  * Pure CSS + Web Animations, no libraries.
  */
 
-const F = (frame: number) => (frame * 1000) / 60;
+/** `/lab?slow=4` plays everything 4x slower, to check motion by eye. */
+let slow = 1;
+const F = (frame: number) => ((frame * 1000) / 60) * slow;
 const CYCLE = 507; // the clip is 8.45s; it loops back to frame 0
 
 const MESSAGE = "Remind me to send Sam the deck";
@@ -261,26 +263,60 @@ function CalendarCard() {
   );
 }
 
-function Bell({ innerRef }: { innerRef?: React.Ref<SVGSVGElement> }) {
+/**
+ * The bell, traced from the clip and mirror-filled where the card edge cuts it. Drawn upright around
+ * the clapper's centre: 92pt across the flared rim, a round dome, a half-disc clapper 5pt below.
+ * The card holds it tilted 24deg with the clapper at (91.5, 74.1); the dome runs off the card's top.
+ */
+const BELL_BODY =
+  "M-39.5 -11.8 C-43.5 -11.8 -46.2 -14.5 -46 -17.8 C-44 -23 -36 -27 -35.5 -34 L-35.5 -52.5 " +
+  "A35.5 35.5 0 0 1 35.5 -52.5 L35.5 -34 C36 -27 44 -23 46 -17.8 C46.2 -14.5 43.5 -11.8 39.5 -11.8 Z";
+
+/** Where the bell hangs from when it rings: up in the dome, on its axis. */
+const BELL_PIVOT = -60;
+const bellPose = (swing: number) =>
+  `translate(91.5px, 74.1px) rotate(24deg) translate(0px, ${BELL_PIVOT}px) rotate(${swing.toFixed(2)}deg) translate(0px, ${-BELL_PIVOT}px)`;
+
+function Bell({ innerRef }: { innerRef?: React.Ref<SVGGElement> }) {
   return (
-    <svg ref={innerRef} width="112" height="126" viewBox="0 0 96 108" aria-hidden="true" style={{ position: "absolute", left: 54, top: -36, transform: "rotate(27deg)", transformOrigin: "50% 60%" }}>
+    <svg width="158" height="158" viewBox="0 0 158 158" aria-hidden="true" style={{ position: "absolute", left: 0, top: 0 }}>
       <defs>
-        <linearGradient id="bell-g" x1="0.85" y1="0" x2="0.2" y2="1">
-          <stop offset="0" stopColor="#6eaaf8" />
-          <stop offset="1" stopColor="#b9d8fd" />
+        <linearGradient id="bell-g" gradientUnits="userSpaceOnUse" x1="0" y1="-88" x2="0" y2="-12">
+          <stop offset="0" stopColor="#6aa9fa" />
+          <stop offset="0.9" stopColor="#a8ccfb" />
+          <stop offset="1" stopColor="#b0d1fb" />
         </linearGradient>
-        <linearGradient id="clap-g" x1="0.5" y1="0" x2="0.5" y2="1">
-          <stop offset="0" stopColor="#9cc6fb" />
-          <stop offset="1" stopColor="#5f9ff3" />
+        <linearGradient id="clap-g" gradientUnits="userSpaceOnUse" x1="0" y1="-6.3" x2="0" y2="7.8">
+          <stop offset="0" stopColor="#70acfb" />
+          <stop offset="1" stopColor="#a4cafb" />
         </linearGradient>
       </defs>
-      <path d="M48 4 C24 4 18 26 18 46 C18 62 12 72 4 80 L92 80 C84 72 78 62 78 46 C78 26 72 4 48 4 Z" fill="url(#bell-g)" />
-      <path d="M36 88 A12 12 0 0 0 60 88 Z" fill="url(#clap-g)" />
+      <g ref={innerRef} style={{ transform: bellPose(0), transformBox: "view-box", transformOrigin: "0 0" }}>
+        <path d={BELL_BODY} fill="url(#bell-g)" />
+        <path d="M-14.1 -6.3 A14.1 14.1 0 0 0 14.1 -6.3 Z" fill="url(#clap-g)" />
+      </g>
     </svg>
   );
 }
 
-function ReminderCard({ bellRef }: { bellRef?: React.Ref<SVGSVGElement> }) {
+/**
+ * The bell's ring, as its swing (deg, clockwise) at each turning point. Held lifted while the card
+ * blurs in, let go on 386, then about 13 frames per swing, dying out by 489.
+ */
+const RING: [frame: number, swing: number][] = [
+  [378, 7.4],
+  [386, 7.4],
+  [398.5, -7.1],
+  [411.5, 4.1],
+  [424.5, -4],
+  [437, 2],
+  [450, -1],
+  [463, 0.5],
+  [476, -0.2],
+  [489, 0],
+];
+
+function ReminderCard({ bellRef }: { bellRef?: React.Ref<SVGGElement> }) {
   return (
     <div style={{ width: 158, height: 158, borderRadius: 14.5, position: "relative", overflow: "hidden", ...softCard }}>
       <Bell innerRef={bellRef} />
@@ -448,7 +484,7 @@ export function AgentReplica() {
     dots: useRef<HTMLDivElement>(null),
     dotsInner: useRef<HTMLDivElement>(null),
     reply: useRef<HTMLDivElement>(null),
-    bell: useRef<SVGSVGElement>(null),
+    bell: useRef<SVGGElement>(null),
     card: useRef<HTMLDivElement>(null),
   };
 
@@ -580,22 +616,20 @@ export function AgentReplica() {
         el.content,
         track(resample(SCROLL.map((p, i) => [380 + i, p])).map(([f, p]) => [f, { transform: `translateY(${(-p * SCROLL_PT).toFixed(2)}px)` }])),
       );
-      // The bell rides in with the card and swings into place: it starts about 8pt left and 4pt high,
-      // tilted less, then springs past its resting tilt and settles by 397.
-      const bellAt = (p: number) => ({
-        transform: `translate(${(-8 * (1 - p)).toFixed(2)}px, ${(-4 * (1 - p)).toFixed(2)}px) rotate(${(16 + 11 * p).toFixed(2)}deg)`,
+      // The bell rings: each swing eases out of one turning point and into the next, like a pendulum.
+      const ring: [number, { transform: string }][] = [];
+      RING.forEach(([f0, a0], i) => {
+        const next = RING[i + 1];
+        if (!next) return ring.push([f0, { transform: bellPose(a0) }]);
+        const [f1, a1] = next;
+        for (let f = f0; f < f1; f += 0.25) ring.push([f, { transform: bellPose(a0 + ((a1 - a0) * (1 - Math.cos((Math.PI * (f - f0)) / (f1 - f0)))) / 2) }]);
       });
-      play(
-        el.bell,
-        track([
-          [378, bellAt(0)],
-          ...spring(16, { stiffness: 520, damping: 30, velocity: 16 }).map((p, i): [number, ReturnType<typeof bellAt>] => [381 + i, bellAt(p)]),
-        ]),
-      );
+      play(el.bell, track(ring));
 
       at(CYCLE, () => run());
     }
 
+    slow = Math.max(1, Number(new URLSearchParams(location.search).get("slow")) || 1);
     run();
     (window as unknown as { __agentSeek?: (f?: number) => void }).__agentSeek = (f) => (f === undefined ? run() : run(f, true));
     return () => {
