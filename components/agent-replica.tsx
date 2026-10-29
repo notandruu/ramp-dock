@@ -67,6 +67,50 @@ const SCROLL_PT = 111;
 
 const PX_PER_PT = 1.8015;
 
+/**
+ * Measured tracks are one sample per clip frame. Played as straight lines between samples they
+ * read as steppy on 120Hz screens, so fill each frame with a Catmull-Rom curve through the samples.
+ */
+function resample(points: [frame: number, ...values: number[]][], perFrame = 4): [number, ...number[]][] {
+  const out: [number, ...number[]][] = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[Math.max(0, i - 1)];
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const p3 = points[Math.min(points.length - 1, i + 2)];
+    const steps = Math.max(1, Math.round((p2[0] - p1[0]) * perFrame));
+    for (let s = 0; s < steps; s++) {
+      const t = s / steps;
+      const t2 = t * t;
+      const t3 = t2 * t;
+      const v = (k: number) =>
+        0.5 * (2 * p1[k] + (-p0[k] + p2[k]) * t + (2 * p0[k] - 5 * p1[k] + 4 * p2[k] - p3[k]) * t2 + (-p0[k] + 3 * p1[k] - 3 * p2[k] + p3[k]) * t3);
+      out.push(p1.map((_, k) => (k === 0 ? p1[0] + (p2[0] - p1[0]) * t : v(k))) as [number, ...number[]]);
+    }
+  }
+  out.push(points[points.length - 1]);
+  return out;
+}
+
+/**
+ * Damped spring from 0 to 1 sampled per frame, for the pieces the clip shows settling with a small bounce.
+ * `velocity` (per second) gives it the head start that makes it snap out instead of easing in.
+ */
+function spring(frames: number, { stiffness = 320, damping = 22, velocity = 0 } = {}) {
+  const dt = 1 / 240;
+  let x = 0;
+  let v = velocity;
+  const out: number[] = [];
+  for (let i = 0; i <= frames * 4; i++) {
+    if (i % 4 === 0) out.push(x);
+    const a = stiffness * (1 - x) - damping * v;
+    v += a * dt;
+    x += v * dt;
+  }
+  out[out.length - 1] = 1;
+  return out;
+}
+
 /** Keyframes with offsets from absolute frame numbers. */
 function track<T extends Record<string, string | number>>(points: [number, T][]) {
   const start = points[0][0];
@@ -128,14 +172,26 @@ function Sent({ children, style, innerRef }: { children: ReactNode; style?: CSSP
   );
 }
 
-function Them({ children, style, innerRef }: { children: ReactNode; style?: CSSProperties; innerRef?: React.Ref<HTMLDivElement> }) {
+function Them({
+  children,
+  style,
+  innerRef,
+  ghost = false,
+}: {
+  children: ReactNode;
+  style?: CSSProperties;
+  innerRef?: React.Ref<HTMLDivElement>;
+  /** Text only: something else paints the bubble behind it. */
+  ghost?: boolean;
+}) {
   return (
     <div style={{ display: "flex", padding: "0 20px", ...style }}>
       <div
         ref={innerRef}
         style={{
           position: "relative",
-          background: THEM_GRAY,
+          zIndex: ghost ? 1 : undefined,
+          background: ghost ? "transparent" : THEM_GRAY,
           color: "#0c0c0c",
           borderRadius: 20,
           padding: "9px 15px",
@@ -145,7 +201,7 @@ function Them({ children, style, innerRef }: { children: ReactNode; style?: CSSP
         }}
       >
         {children}
-        <Tail side="left" color={THEM_GRAY} />
+        {!ghost && <Tail side="left" color={THEM_GRAY} />}
       </div>
     </div>
   );
@@ -205,9 +261,9 @@ function CalendarCard() {
   );
 }
 
-function Bell() {
+function Bell({ innerRef }: { innerRef?: React.Ref<SVGSVGElement> }) {
   return (
-    <svg width="112" height="126" viewBox="0 0 96 108" aria-hidden="true" style={{ position: "absolute", left: 54, top: -36, transform: "rotate(27deg)", transformOrigin: "50% 60%" }}>
+    <svg ref={innerRef} width="112" height="126" viewBox="0 0 96 108" aria-hidden="true" style={{ position: "absolute", left: 54, top: -36, transform: "rotate(27deg)", transformOrigin: "50% 60%" }}>
       <defs>
         <linearGradient id="bell-g" x1="0.85" y1="0" x2="0.2" y2="1">
           <stop offset="0" stopColor="#6eaaf8" />
@@ -224,10 +280,10 @@ function Bell() {
   );
 }
 
-function ReminderCard() {
+function ReminderCard({ bellRef }: { bellRef?: React.Ref<SVGSVGElement> }) {
   return (
     <div style={{ width: 158, height: 158, borderRadius: 14.5, position: "relative", overflow: "hidden", ...softCard }}>
-      <Bell />
+      <Bell innerRef={bellRef} />
       <div style={{ position: "absolute", left: 20, top: 74, display: "flex", alignItems: "baseline", gap: 3, color: "#0c0c0c" }}>
         <span style={{ fontSize: 42, lineHeight: "42px", letterSpacing: -1 }}>4</span>
         <span style={{ fontSize: 16 }}>PM</span>
@@ -390,7 +446,9 @@ export function AgentReplica() {
     sendMic: useRef<SVGSVGElement>(null),
     sent: useRef<HTMLDivElement>(null),
     dots: useRef<HTMLDivElement>(null),
+    dotsInner: useRef<HTMLDivElement>(null),
     reply: useRef<HTMLDivElement>(null),
+    bell: useRef<SVGSVGElement>(null),
     card: useRef<HTMLDivElement>(null),
   };
 
@@ -464,7 +522,10 @@ export function AgentReplica() {
       play(
         el.sent,
         track(
-          FLIGHT.map(([f, bottom, s, o]) => [f, { transform: `translateY(${((bottom - 992) / PX_PER_PT).toFixed(2)}px) scale(${s})`, opacity: o }]),
+          resample(FLIGHT).map(([f, bottom, s, o]) => [
+            f,
+            { transform: `translateY(${((bottom - 992) / PX_PER_PT).toFixed(2)}px) scale(${s.toFixed(4)})`, opacity: Math.min(1, o) },
+          ]),
         ),
       );
       at(153, () => {
@@ -478,17 +539,59 @@ export function AgentReplica() {
       at(203, () => show(el.dots));
       play(el.dots, blurIn([[203, 8, 0], [205, 6, 0.6], [210, 0, 1]]));
 
-      // The reply replaces the dots in place.
-      at(294, () => {
-        hide(el.dots);
-        show(el.reply);
-      });
-      play(el.reply, blurIn([[294, 10, 0.35], [295, 6, 0.6], [296, 3, 0.8], [298, 0, 1]]));
+      // The dots bubble becomes the reply. On frame 294 it is already the reply's size, blurred and about
+      // 8pt low; it springs up into place by 303. The words sit on top and clear a beat behind the bubble.
+      at(294, () => show(el.reply));
+      play(el.dotsInner, track([[293, { opacity: 1, filter: "blur(0px)" }], [294, { opacity: 0, filter: "blur(4px)" }]]));
+      const w = el.reply.offsetWidth;
+      const h = el.reply.offsetHeight;
+      const rise = spring(9, { stiffness: 1000, damping: 58, velocity: 22 }).map((p, i) => ({ f: 294 + i, y: 8 * (1 - p) }));
+      const textBlur: Record<number, [blur: number, opacity: number]> = { 294: [7, 0.55], 295: [2.6, 0.85], 296: [1.8, 0.92], 297: [1.1, 0.97], 298: [0.45, 1], 299: [0.1, 1] };
+      play(
+        el.dots,
+        track([
+          [293, { width: "61px", height: "34px", borderRadius: "17px", transform: "translateY(0px)", filter: "blur(0px)" }],
+          ...rise.map(({ f, y }): [number, Record<string, string>] => [
+            f,
+            {
+              width: `${w}px`,
+              height: `${h}px`,
+              borderRadius: "20px",
+              transform: `translateY(${y.toFixed(2)}px)`,
+              filter: `blur(${Math.max(0, 5 - 4 * (f - 294)).toFixed(2)}px)`,
+            },
+          ]),
+        ]),
+      );
+      play(
+        el.reply,
+        track(
+          rise.map(({ f, y }) => {
+            const [blur, opacity] = textBlur[f] ?? [0, 1];
+            return [f, { opacity, filter: `blur(${blur}px)`, transform: `translateY(${y.toFixed(2)}px)` }];
+          }),
+        ),
+      );
 
       // The reminder card lands and the thread scrolls it into view.
       at(378, () => show(el.card));
       play(el.card, blurIn([[378, 14, 0.2], [382, 6, 0.6], [385, 1, 0.95], [387, 0, 1]]));
-      play(el.content, track(SCROLL.map((p, i) => [380 + i, { transform: `translateY(${(-p * SCROLL_PT).toFixed(2)}px)` }])));
+      play(
+        el.content,
+        track(resample(SCROLL.map((p, i) => [380 + i, p])).map(([f, p]) => [f, { transform: `translateY(${(-p * SCROLL_PT).toFixed(2)}px)` }])),
+      );
+      // The bell rides in with the card and swings into place: it starts about 8pt left and 4pt high,
+      // tilted less, then springs past its resting tilt and settles by 397.
+      const bellAt = (p: number) => ({
+        transform: `translate(${(-8 * (1 - p)).toFixed(2)}px, ${(-4 * (1 - p)).toFixed(2)}px) rotate(${(16 + 11 * p).toFixed(2)}deg)`,
+      });
+      play(
+        el.bell,
+        track([
+          [378, bellAt(0)],
+          ...spring(16, { stiffness: 520, damping: 30, velocity: 16 }).map((p, i): [number, ReturnType<typeof bellAt>] => [381 + i, bellAt(p)]),
+        ]),
+      );
 
       at(CYCLE, () => run());
     }
@@ -549,7 +652,7 @@ export function AgentReplica() {
                   {MESSAGE}
                 </Sent>
                 <div style={{ position: "relative", marginTop: 14.4 }}>
-                  <Them innerRef={r.reply}>
+                  <Them innerRef={r.reply} ghost>
                     Done. I&apos;ll nudge you Thursday at
                     <br />
                     4, and I&apos;ve attached the latest
@@ -567,24 +670,23 @@ export function AgentReplica() {
                       height: 34,
                       borderRadius: 17,
                       background: THEM_GRAY,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 5,
+                      transformOrigin: "0% 100%",
                     }}
                   >
-                    {[0, 1, 2].map((i) => (
-                      <span
-                        key={i}
-                        className="agent-dot"
-                        style={{ width: 7.6, height: 7.6, borderRadius: 4, background: "#8e8e8e", animationDelay: `${0.06 + i * 0.32}s` }}
-                      />
-                    ))}
+                    <div ref={r.dotsInner} style={{ position: "absolute", left: 0, top: 0, width: 61, height: 34, display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
+                      {[0, 1, 2].map((i) => (
+                        <span
+                          key={i}
+                          className="agent-dot"
+                          style={{ width: 7.6, height: 7.6, borderRadius: 4, background: "#8e8e8e", animationDelay: `${0.06 + i * 0.32}s` }}
+                        />
+                      ))}
+                    </div>
                     <Tail side="left" color={THEM_GRAY} />
                   </div>
                 </div>
                 <div ref={r.card} style={{ marginTop: 13.5, paddingLeft: 20 }}>
-                  <ReminderCard />
+                  <ReminderCard bellRef={r.bell} />
                 </div>
               </div>
 
