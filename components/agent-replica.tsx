@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { F, blurIn, readSlow, resample, spring, track, widgetEntrance } from "./agent-kit/motion";
-import { BELL, Widget, glyphPose, softCard } from "./agent-kit/widget";
+import { BELL, Dim, PlanCard, Widget } from "./agent-kit/widget";
 
 /*
  * A 1:1 rebuild of the "Text your agent" iPhone clip (8.45s, 60fps), from the foundations.
@@ -144,49 +144,14 @@ function Them({
 }
 
 function CalendarCard() {
-  const gray = { color: "#8a8a8a" };
   return (
-    <div style={{ margin: "14px 19px 0 20px", height: 188, borderRadius: 20, position: "relative", ...softCard }}>
-      <div
-        style={{
-          position: "absolute",
-          left: 18,
-          top: 16.5,
-          width: 71,
-          height: 77,
-          borderRadius: 9,
-          overflow: "hidden",
-          background: "linear-gradient(180deg, #84b8f9 0%, #b7d6fc 100%)",
-          boxShadow: "0 2px 4px rgba(40,90,160,0.25)",
-        }}
-      >
-        <div
-          style={{
-            height: 25,
-            background: "linear-gradient(180deg, #6ba8f6, #7cb3f8)",
-            borderBottom: "1px solid rgba(60,120,200,0.35)",
-            color: "#fff",
-            fontSize: 12.5,
-            textAlign: "center",
-            lineHeight: "25px",
-          }}
-        >
-          Sat
-        </div>
-        <div style={{ color: "#fff", fontSize: 40, fontWeight: 300, textAlign: "center", lineHeight: "50px", letterSpacing: -1 }}>10</div>
-      </div>
-      <div style={{ position: "absolute", left: 102.5, top: 18, fontSize: 17, color: "#6e6e6e" }}>Mom&apos;s birthday</div>
-      <div style={{ position: "absolute", left: 18, top: 108, fontSize: 17, lineHeight: "20.5px", color: "#0c0c0c", letterSpacing: -0.2 }}>
-        Market with Mom <span style={gray}>at</span> 11am<span style={gray}>,</span> lunch <span style={gray}>at</span> 1pm
-        <span style={gray}>,</span>
+    <div style={{ margin: "14px 19px 0 20px" }}>
+      <PlanCard tile={{ label: "Sat", value: "10" }} title="Mom's birthday">
+        Market with Mom <Dim>at</Dim> 11am<Dim>,</Dim> lunch <Dim>at</Dim> 1pm
+        <Dim>,</Dim>
         <br />
-        <span style={gray}>then</span> call Mom <span style={gray}>at</span> 5:55pm<span style={gray}>.</span>
-      </div>
-      <div style={{ position: "absolute", left: 18, right: 18, top: 168.5, display: "flex", gap: 4.4 }}>
-        {[0, 1, 2].map((i) => (
-          <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: "linear-gradient(180deg, #7db6fa, #9cc8fc)" }} />
-        ))}
-      </div>
+        <Dim>then</Dim> call Mom <Dim>at</Dim> 5:55pm<Dim>.</Dim>
+      </PlanCard>
     </div>
   );
 }
@@ -346,7 +311,6 @@ export function AgentReplica() {
     dots: useRef<HTMLDivElement>(null),
     dotsInner: useRef<HTMLDivElement>(null),
     reply: useRef<HTMLDivElement>(null),
-    bell: useRef<SVGGElement>(null),
     card: useRef<HTMLDivElement>(null),
   };
 
@@ -474,14 +438,13 @@ export function AgentReplica() {
       // The reminder card lands and the thread scrolls it into view.
       at(378, () => show(el.card));
       // The reminder widget lands: the card blurs in and its bell rings.
-      const widget = widgetEntrance(378, glyphPose);
+      const widget = widgetEntrance(378, BELL.gesture);
       play(el.card, widget.card);
+      for (const [part, t] of Object.entries(widget.parts)) play(el.card.querySelector(`[data-part=${part}]`)!, t);
       play(
         el.content,
         track(resample(SCROLL.map((p, i) => [380 + i, p])).map(([f, p]) => [f, { transform: `translateY(${(-p * SCROLL_PT).toFixed(2)}px)` }])),
       );
-      play(el.bell, widget.glyph);
-
       at(CYCLE, () => run());
     }
 
@@ -576,7 +539,7 @@ export function AgentReplica() {
                   </div>
                 </div>
                 <div ref={r.card} style={{ marginTop: 13.5, paddingLeft: 20 }}>
-                  <Widget glyph={BELL} value="4" unit="PM" caption="Thu - Deck to Sam" glyphRef={r.bell} />
+                  <Widget glyph={BELL} value="4" unit="PM" caption="Thu - Deck to Sam" />
                 </div>
               </div>
 

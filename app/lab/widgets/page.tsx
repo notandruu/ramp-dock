@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function Widgets() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#fdfdfd] px-4 py-10">
+    <main className="flex min-h-screen justify-center bg-[#fdfdfd] px-4 py-16">
       <WidgetGallery />
     </main>
   );

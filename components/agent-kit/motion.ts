@@ -101,6 +101,13 @@ export function swing(points: [frame: number, value: number][], pose: (value: nu
 
 /* ---------- the widget entrance, measured off the reminder card ---------- */
 
+/*
+ * Every widget lands the same way: the card blurs in, its glyph is held while it does, and is let go
+ * at RELEASE. What the glyph does once let go depends on what it is (a bell rings, a box drops, a
+ * bill prints), but every gesture is built from the clip's timing: BEAT frames per move, and each
+ * move smaller than the last by about DECAY. A glyph never does something its real object wouldn't.
+ */
+
 /** How the card itself arrives, frames after it lands: soft and pale, crisp by 9. */
 export const WIDGET_BLUR: [frame: number, blur: number, opacity: number][] = [
   [0, 14, 0.2],
@@ -109,11 +116,18 @@ export const WIDGET_BLUR: [frame: number, blur: number, opacity: number][] = [
   [9, 0, 1],
 ];
 
+/** Frames after landing when the glyph is let go: the card is nearly crisp by then. */
+export const RELEASE = 8;
+/** One move, measured as the bell's half swing. */
+export const BEAT = 12.75;
+/** Each move against the one before it, from the bell's peaks (7.1, 4.1, 2, 1). */
+export const DECAY = 0.55;
+
 /**
- * How its glyph rings, frames after the card lands, as swing in degrees (clockwise) at each turning
- * point. Held lifted while the card blurs in, let go at 8, about 13 frames per swing, still at 111.
+ * The bell's ring as swing in degrees (clockwise) at each turning point: held lifted while the card
+ * blurs in, let go at RELEASE, then about a BEAT per swing until it hangs still at 111.
  */
-export const WIDGET_RING: [frame: number, swing: number][] = [
+export const RING: [frame: number, swing: number][] = [
   [0, 7.4],
   [8, 7.4],
   [20.5, -7.1],
@@ -126,13 +140,64 @@ export const WIDGET_RING: [frame: number, swing: number][] = [
   [111, 0],
 ];
 
-/** The whole entrance for a widget landing at `start`: one track for the card, one for its glyph. */
-export function widgetEntrance(start: number, glyphPose: (swing: number) => string) {
+/** Parts of a widget's glyph that a gesture can move. */
+export type GlyphPart = "glyph" | "body" | "accent";
+export type Gesture = (start: number) => Partial<Record<GlyphPart, Track>>;
+
+/** Rings like a bell, on the whole glyph (body and clapper together). */
+export const ring =
+  (pose: (swing: number) => string): Gesture =>
+  (start) => ({ glyph: swing(RING.map(([f, a]) => [start + f, a]), pose) });
+
+/**
+ * Held up while the card blurs in, then dropped: falls a BEAT, lands, and bounces lower each time
+ * until it sits. Ball arcs (fast at the ground, slow at the top), the accent stays put as the ground.
+ */
+export const drop =
+  (height = 16): Gesture =>
+  (start) => {
+    const out: [number, { transform: string }][] = [[start, { transform: `translateY(${-height}px)` }]];
+    const at = (f: number, y: number) => out.push([f, { transform: `translateY(${y.toFixed(2)}px)` }]);
+    let f = start + RELEASE;
+    at(f, -height);
+    for (let s = 1; s <= 8; s++) at(f + (BEAT * s) / 8, -height * (1 - (s / 8) ** 2));
+    f += BEAT;
+    for (let bounce = height * DECAY * DECAY, beat = BEAT * DECAY; bounce > 0.4; bounce *= DECAY * DECAY, beat *= DECAY) {
+      for (let s = 1; s <= 8; s++) at(f + (beat * s) / 8, -bounce * 4 * (s / 8) * (1 - s / 8));
+      f += beat;
+    }
+    return { body: track(out) };
+  };
+
+/**
+ * Feeds out like a slip from a printer: slides down its own length at an even pace over two BEATs,
+ * stops with a small give, then its accent pops in (a BEAT, overshooting by DECAY's worth and back).
+ */
+export const feed =
+  (length = 40): Gesture =>
+  (start) => {
+    const f0 = start + RELEASE;
+    const f1 = f0 + 2 * BEAT;
+    const body = track([
+      [start, { transform: `translateY(${-length}px)` }],
+      [f0, { transform: `translateY(${-length}px)` }],
+      [f1, { transform: "translateY(0px)" }],
+      [f1 + BEAT / 3, { transform: "translateY(-1.2px)" }],
+      [f1 + BEAT, { transform: "translateY(0px)" }],
+    ]);
+    const pop = spring(Math.round(BEAT * 1.5), { stiffness: 520, damping: 20, velocity: 8 });
+    const accent = track([
+      [start, { transform: "scale(0)" }],
+      [f1, { transform: "scale(0)" }],
+      ...pop.map((p, i): [number, { transform: string }] => [f1 + 1 + i, { transform: `scale(${p.toFixed(3)})` }]),
+    ]);
+    return { body, accent };
+  };
+
+/** The whole entrance for a widget landing at `start`: the card, plus its glyph's gesture. */
+export function widgetEntrance(start: number, gesture?: Gesture) {
   return {
     card: blurIn(WIDGET_BLUR.map(([f, b, o]) => [start + f, b, o])),
-    glyph: swing(
-      WIDGET_RING.map(([f, a]) => [start + f, a]),
-      glyphPose,
-    ),
+    parts: gesture ? gesture(start) : {},
   };
 }

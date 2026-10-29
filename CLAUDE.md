@@ -27,10 +27,11 @@ Phone UI uses the `font-ios` stack. In-thread cards: off-white with a hairline b
 
 ## Agent widgets (`components/agent-kit/`)
 
-The small square cards the agent drops into a thread. They all copy the reminder card from the "Text your agent" clip, rebuilt frame by frame at `/lab`. Preview every widget at `/lab/widgets`, and add `?slow=4` to either page to watch motion slowed down.
+The cards the agent drops into a thread, copied from the two in the "Text your agent" clip (rebuilt frame by frame at `/lab`). Preview them at `/lab/widgets`, and add `?slow=4` to either page to watch motion slowed down.
 
-- Build a new widget as `<Widget glyph={...} value unit caption />`. Do not restyle the card, the type or the glyph placement per widget
-- A glyph is a `GlyphShape` drawn upright in the shared frame: about 92pt wide, top near y=-88, bottom edge near y=-12, an optional small accent a few points below (the bell's clapper, the box's pallet, the bill's coin). The card tilts it 24deg and bleeds its top off the corner. Flat silhouettes in the one blue gradient, no outlines, no second color
-- Keep value plus unit inside about 70pt (one to three digits and a short word) so it clears the accent. Longer facts go in the caption
-- Motion comes from `motion.ts` only. Land a widget with `widgetEntrance(frame, glyphPose)`: the measured blur-in for the card and the pendulum ring for the glyph. No custom easings, durations or bounces
-- New curves get measured off a recording first, then added to `motion.ts` as frame-keyed points, never eyeballed
+- Two templates, nothing else: `Widget` (the square reminder card: glyph in the corner, big value, gray caption) and `PlanCard` (the wide calendar card: label tile, gray title, a sentence with the joining words in `Dim`, one blue bar per step). Do not restyle either per use
+- A glyph is a `GlyphShape` drawn upright in the shared frame: about 92pt wide, top near y=-88, bottom edge near y=-12, an optional small accent a few points below. The card tilts it 24deg and bleeds its top off the corner. Flat silhouettes in the one blue gradient, no outlines, no second color
+- Keep value plus unit inside about 70pt so it clears the accent. Longer facts go in the caption
+- Every widget lands the same way (`widgetEntrance`): the card blurs in, its glyph is held, then let go at `RELEASE`
+- What the glyph does once let go must be something the real object does. A bell rings (`ring`), a box drops onto its pallet (`drop`), a bill feeds out and its coin pops in (`feed`). Never give one object another's gesture, and a glyph with no honest gesture holds still. `PlanCard` always holds still, like the clip's calendar
+- Build new gestures in `motion.ts` from the clip's timing only: `BEAT` frames per move, each move `DECAY` of the one before. No other easings, durations or bounces. Anything new that the clip shows gets measured off a recording first

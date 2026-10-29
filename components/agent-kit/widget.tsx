@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, type CSSProperties, type Ref } from "react";
+import { useId, type CSSProperties, type ReactNode } from "react";
+import { drop, feed, ring, type Gesture } from "./motion";
 
 /*
  * The in-thread widget, measured off the reminder card in the "Text your agent" clip. Sizes are
@@ -41,6 +42,8 @@ export type GlyphShape = {
   accent?: string;
   /** Vertical span of the accent, for its gradient. */
   accentSpan?: [top: number, bottom: number];
+  /** What it does once the card lets go of it, true to the real object. Leave out to hold still. */
+  gesture?: Gesture;
 };
 
 /** One blue: deeper at the glyph's top, lighter toward its open edge, sampled off the clip's bell. */
@@ -60,14 +63,17 @@ function GlyphPaint({ id, accentSpan = [-6.3, 7.8] }: { id: string; accentSpan?:
   );
 }
 
-export function Glyph({ shape, innerRef }: { shape: GlyphShape; innerRef?: Ref<SVGGElement> }) {
+/** Parts are tagged `data-part` so a gesture can find them: the whole glyph, its body, its accent. */
+export function Glyph({ shape }: { shape: GlyphShape }) {
   const id = useId().replace(/:/g, "");
   return (
     <svg width={WIDGET_SIZE} height={WIDGET_SIZE} viewBox={`0 0 ${WIDGET_SIZE} ${WIDGET_SIZE}`} aria-hidden="true" style={{ position: "absolute", left: 0, top: 0 }}>
       <GlyphPaint id={id} accentSpan={shape.accentSpan} />
-      <g ref={innerRef} style={{ transform: glyphPose(0), transformBox: "view-box", transformOrigin: "0 0" }}>
-        <path d={shape.body} fill={`url(#${id}-body)`} fillRule="evenodd" />
-        {shape.accent && <path d={shape.accent} fill={`url(#${id}-accent)`} />}
+      <g data-part="glyph" style={{ transform: glyphPose(0), transformBox: "view-box", transformOrigin: "0 0" }}>
+        <path data-part="body" d={shape.body} fill={`url(#${id}-body)`} fillRule="evenodd" />
+        {shape.accent && (
+          <path data-part="accent" d={shape.accent} fill={`url(#${id}-accent)`} style={{ transformBox: "fill-box", transformOrigin: "center" }} />
+        )}
       </g>
     </svg>
   );
@@ -83,17 +89,15 @@ export function Widget({
   value,
   unit,
   caption,
-  glyphRef,
 }: {
   glyph: GlyphShape;
   value: string;
   unit?: string;
   caption: string;
-  glyphRef?: Ref<SVGGElement>;
 }) {
   return (
     <div style={{ width: WIDGET_SIZE, height: WIDGET_SIZE, borderRadius: RADIUS, position: "relative", overflow: "hidden", ...softCard }}>
-      <Glyph shape={glyph} innerRef={glyphRef} />
+      <Glyph shape={glyph} />
       <div style={{ position: "absolute", left: 20, top: 74, display: "flex", alignItems: "baseline", gap: 3, color: INK }}>
         <span style={{ fontSize: 42, lineHeight: "42px", letterSpacing: -1 }}>{value}</span>
         {unit && <span style={{ fontSize: 16 }}>{unit}</span>}
@@ -117,6 +121,7 @@ export const BELL: GlyphShape = {
     "A35.5 35.5 0 0 1 35.5 -52.5 L35.5 -34 C36 -27 44 -23 46 -17.8 C46.2 -14.5 43.5 -11.8 39.5 -11.8 Z",
   accent: "M-14.1 -6.3 A14.1 14.1 0 0 0 14.1 -6.3 Z",
   accentSpan: [-6.3, 7.8],
+  gesture: ring(glyphPose),
 };
 
 /** A delivery box with a strip of tape, sitting on a small pallet as the accent. */
@@ -126,9 +131,10 @@ export const BOX: GlyphShape = {
     "M-7 -84 L7 -84 L7 -62 Q7 -60 5 -60 L-5 -60 Q-7 -60 -7 -62 Z",
   accent: "M-20 -8 L20 -8 Q24 -8 24 -4 Q24 0 20 0 L-20 0 Q-24 0 -24 -4 Q-24 -8 -20 -8 Z",
   accentSpan: [-8, 0],
+  gesture: drop(16),
 };
 
-/** A paid bill: a slip with a torn bottom edge and two lines, and a coin dropping out under it. */
+/** A paid bill: a slip with a torn bottom edge and two lines, and the coin that says it is paid. */
 export const BILL: GlyphShape = {
   body:
     "M-30 -88 L30 -88 Q36 -88 36 -82 L36 -12 L30 -17 L24 -12 L18 -17 L12 -12 L6 -17 L0 -12 L-6 -17 L-12 -12 " +
@@ -137,4 +143,59 @@ export const BILL: GlyphShape = {
     "M-22 -32 L8 -32 Q10 -32 10 -30 L10 -27 Q10 -25 8 -25 L-22 -25 Q-24 -25 -24 -27 L-24 -30 Q-24 -32 -22 -32 Z",
   accent: "M0 -6 A10 10 0 1 1 0 14 A10 10 0 1 1 0 -6 Z",
   accentSpan: [-6, 14],
+  gesture: feed(40),
 };
+
+/* ---------- the wide card ---------- */
+
+/** Gray words in a plan card's sentence: the joining words, so the facts stand out. */
+export function Dim({ children }: { children: ReactNode }) {
+  return <span style={{ color: "#8a8a8a" }}>{children}</span>;
+}
+
+/**
+ * The wide card, measured off the clip's calendar card: a small tile with a label strip and a big
+ * number, a gray title beside it, a two-line sentence (facts dark, joining words in `Dim`), and one
+ * blue bar per step along the bottom. It holds still: the thread's scroll is its only motion.
+ */
+export function PlanCard({ tile, title, steps = 3, children }: { tile: { label: string; value: string }; title: string; steps?: number; children: ReactNode }) {
+  return (
+    <div style={{ height: 188, borderRadius: 20, position: "relative", ...softCard }}>
+      <div
+        style={{
+          position: "absolute",
+          left: 18,
+          top: 16.5,
+          width: 71,
+          height: 77,
+          borderRadius: 9,
+          overflow: "hidden",
+          background: "linear-gradient(180deg, #84b8f9 0%, #b7d6fc 100%)",
+          boxShadow: "0 2px 4px rgba(40,90,160,0.25)",
+        }}
+      >
+        <div
+          style={{
+            height: 25,
+            background: "linear-gradient(180deg, #6ba8f6, #7cb3f8)",
+            borderBottom: "1px solid rgba(60,120,200,0.35)",
+            color: "#fff",
+            fontSize: 12.5,
+            textAlign: "center",
+            lineHeight: "25px",
+          }}
+        >
+          {tile.label}
+        </div>
+        <div style={{ color: "#fff", fontSize: 40, fontWeight: 300, textAlign: "center", lineHeight: "50px", letterSpacing: -1 }}>{tile.value}</div>
+      </div>
+      <div style={{ position: "absolute", left: 102.5, top: 18, fontSize: 17, color: "#6e6e6e" }}>{title}</div>
+      <div style={{ position: "absolute", left: 18, top: 108, fontSize: 17, lineHeight: "20.5px", color: INK, letterSpacing: -0.2 }}>{children}</div>
+      <div style={{ position: "absolute", left: 18, right: 18, top: 168.5, display: "flex", gap: 4.4 }}>
+        {Array.from({ length: steps }, (_, i) => (
+          <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: "linear-gradient(180deg, #7db6fa, #9cc8fc)" }} />
+        ))}
+      </div>
+    </div>
+  );
+}
