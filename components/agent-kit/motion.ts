@@ -26,8 +26,8 @@ export function track<T extends Record<string, string | number>>(points: [number
 }
 
 /** Play a track from now and hold its last frame. */
-export function playTrack(node: Element, t: Track) {
-  return node.animate(t.keyframes, { delay: t.delay, duration: t.duration, easing: "linear", fill: "forwards" });
+export function playTrack(node: Element, t: Track, fill: FillMode = "forwards") {
+  return node.animate(t.keyframes, { delay: t.delay, duration: t.duration, easing: "linear", fill });
 }
 
 /**
@@ -285,4 +285,54 @@ export function widgetEntrance(start: number, gesture?: Gesture) {
     card: blurIn(WIDGET_BLUR.map(([f, b, o]) => [start + f, b, o])),
     parts: gesture ? gesture(start) : {},
   };
+}
+
+/* ---------- cues: the honest motion inside bigger cards ---------- */
+
+/*
+ * Cards mark what may move with `data-cue`, and `cascade` times it all after the card lands. Each cue
+ * is something the content really does when it shows up, and they go one after another down the
+ * card, so a card reads top to bottom the way it would be written out.
+ *   row   a line arrives: clears from soft and pale, rising 3pt (like the reply's words), half a BEAT
+ *   fill  a bar fills to its amount, braking, over two BEATs (the element is drawn at its full amount)
+ *   grow  a chart bar grows up from its base; bars follow each other a quarter BEAT apart
+ *   pop   a dot or badge appears, overshooting by DECAY's worth and settling
+ *   draw  a stroke draws itself, braking (pathLength="1"; a part-way stroke sets data-draw to its length)
+ */
+export type Cue = "row" | "fill" | "grow" | "pop" | "draw";
+
+/** How long after a cue starts the next one may start. */
+const NEXT: Record<Cue, number> = { row: BEAT / 2, fill: BEAT / 2, grow: BEAT / 4, pop: BEAT / 2, draw: BEAT / 2 };
+
+function cueTrack(cue: Cue, t: number, length: number): Track {
+  switch (cue) {
+    case "row":
+      return track(
+        curve(t, t + BEAT / 2, (f) => {
+          const k = brake(f, t, t + BEAT / 2);
+          return { opacity: k.toFixed(3), filter: `blur(${(5 * (1 - k)).toFixed(2)}px)`, transform: `translateY(${(3 * (1 - k)).toFixed(2)}px)` };
+        }),
+      );
+    case "fill":
+      return track(curve(t, t + 2 * BEAT, (f) => ({ transform: `scaleX(${brake(f, t, t + 2 * BEAT).toFixed(4)})` })));
+    case "grow":
+      return track(curve(t, t + 1.5 * BEAT, (f) => ({ transform: `scaleY(${brake(f, t, t + 1.5 * BEAT).toFixed(4)})` })));
+    case "pop": {
+      const k = spring(Math.round(1.5 * BEAT), { stiffness: 520, damping: 20, velocity: 8 });
+      return track(k.map((p, i): [number, Record<string, string>] => [t + i, { transform: `scale(${p.toFixed(3)})` }]));
+    }
+    case "draw":
+      return track(curve(t, t + 1.5 * BEAT, (f) => ({ strokeDashoffset: (length * (1 - brake(f, t, t + 1.5 * BEAT))).toFixed(4) })));
+  }
+}
+
+/** Every cue inside `root`, in reading order, timed to start once the card lands at `start`. Play with fill "both". */
+export function cascade(root: Element, start: number): [Element, Track][] {
+  let t = start + RELEASE;
+  return [...root.querySelectorAll<HTMLElement | SVGElement>("[data-cue]")].map((node) => {
+    const cue = node.dataset.cue as Cue;
+    const out: [Element, Track] = [node, cueTrack(cue, t, Number(node.dataset.draw ?? 1))];
+    t += NEXT[cue];
+    return out;
+  });
 }

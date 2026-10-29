@@ -1,107 +1,162 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { playTrack, readSlow, widgetEntrance } from "./motion";
-import { BELL, BILL, BOX, CARD, Dim, PlanCard, STAMP, TRUCK, Widget, WIDGET_SIZE, type GlyphShape } from "./widget";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { cascade, playTrack, readSlow, widgetEntrance, type Gesture } from "./motion";
+import { BELL, BILL, BOX, CARD, STAMP, TRUCK, Widget, type GlyphShape } from "./widget";
+import { ApprovalCard, ChartCard, ContactRow, Dim, ListCard, MatchCard, MeterWidget, PlanCard, ReplyChips, TrackerCard, WaitingWidget } from "./cards";
 
-const WIDGETS: { name: string; glyph: GlyphShape; value: string; unit?: string; caption: string }[] = [
-  { name: "Reminder: the bell rings", glyph: BELL, value: "4", unit: "PM", caption: "Thu - Deck to Sam" },
-  { name: "Card: tapped like at a reader", glyph: CARD, value: "$60", caption: "Dana - Tools" },
-  { name: "Bill paid: prints out", glyph: BILL, value: "3", unit: "paid", caption: "Bills - $8,410 in all" },
-  { name: "Approved: stamped", glyph: STAMP, value: "OK", caption: "Laptop for Priya" },
-  { name: "Delivered: box dropped in", glyph: BOX, value: "40", unit: "sheets", caption: "Drywall - Elm St" },
-  { name: "On the way: truck pulls up", glyph: TRUCK, value: "10", unit: "AM", caption: "Ridgeline - Elm St" },
+type Item = { name: string; card: ReactNode; gesture?: Gesture };
+
+const glyph = (name: string, g: GlyphShape, value: string, unit: string | undefined, caption: string): Item => ({
+  name,
+  gesture: g.gesture,
+  card: <Widget glyph={g} value={value} unit={unit} caption={caption} />,
+});
+
+const SECTIONS: { title: string; items: Item[] }[] = [
+  {
+    title: "Small",
+    items: [
+      glyph("Reminder: the bell rings", BELL, "4", "PM", "Thu - Deck to Sam"),
+      glyph("Card spend: tapped", CARD, "$60", undefined, "Dana - Tools"),
+      glyph("Bills paid: prints out", BILL, "3", "paid", "Bills - $8,410 in all"),
+      glyph("Approved: stamped", STAMP, "OK", undefined, "Laptop for Priya"),
+      glyph("Delivered: box dropped in", BOX, "40", "sheets", "Drywall - Elm St"),
+      glyph("On the way: truck pulls up", TRUCK, "10", "AM", "Ridgeline - Elm St"),
+      { name: "Budget left: ring draws to what's spent", card: <MeterWidget value="$240" unit="left" caption="Office snacks - May" spent={0.76} /> },
+      { name: "Waiting on you: faces pop in", card: <WaitingWidget count="3" caption="Approvals for you" people={["DK", "SR", "PL"]} /> },
+    ],
+  },
+  {
+    title: "Medium",
+    items: [
+      {
+        name: "Delivery: line fills to where it is",
+        card: <TrackerCard title="Drywall to Elm St" time="10:40" unit="AM" status="On the truck" steps={["Ordered", "Packed", "On the truck", "Here"]} at={2} />,
+      },
+      {
+        name: "Spend: weeks grow in",
+        card: <ChartCard title="Spent in May" total="$12,480" note="$2,100 less than April" weeks={[2100, 3400, 2600, 3900, 2900, 1800]} />,
+      },
+      {
+        name: "Slip and bill agree: the check draws",
+        card: (
+          <MatchCard left="Slip" right="Bill">
+            40 sheets <Dim>on</Dim> both<Dim>, so the bill gets paid</Dim> Friday<Dim>.</Dim>
+          </MatchCard>
+        ),
+      },
+      {
+        name: "Plan: holds still, like the clip's calendar",
+        card: (
+          <div style={{ width: 354 }}>
+            <PlanCard tile={{ label: "Fri", value: "12" }} title="Drywall for Elm St">
+              40 sheets <Dim>from</Dim> Ridgeline <Dim>by</Dim> 10am<Dim>,</Dim>
+              <br />
+              <Dim>then</Dim> Marco snaps the slip<Dim>.</Dim>
+            </PlanCard>
+          </div>
+        ),
+      },
+    ],
+  },
+  {
+    title: "Large",
+    items: [
+      {
+        name: "Ask to buy: price, budget fills, answers",
+        card: <ApprovalCard who="Dana" initials="DK" what="A laptop for the new hire" price="$1,299" budget="Team budget after this" left="$3,701 of $5,000"
+            used={0.26}
+            facts={[
+              ["From", "Apple, ships Tuesday"],
+              ["For", "Priya, starts Monday"],
+            ]}
+          />,
+      },
+      {
+        name: "Order: written out line by line",
+        card: (
+          <ListCard
+            tile={{ label: "Fri", value: "12" }}
+            title="Kitchen order"
+            note="Harbor Produce, by 7am"
+            lines={[
+              ["Romaine", "6 cases", "$108"],
+              ["Lemons", "2 boxes", "$64"],
+              ["Olive oil", "4 tins", "$152"],
+              ["Chicken thighs", "40 lb", "$136"],
+              ["To-go cups", "2 sleeves", "$38"],
+            ]}
+            total="$498"
+          />
+        ),
+      },
+    ],
+  },
+  {
+    title: "In the thread",
+    items: [
+      { name: "Vendor", card: <ContactRow initials="RL" name="Ridgeline Lumber" detail="Paid in 30 days - 12 orders this year" /> },
+      { name: "Vendor", card: <ContactRow initials="HP" name="Harbor Produce" detail="Comes Tue and Fri - last order $498" /> },
+      { name: "Tap instead of typing: one at a time", card: <ReplyChips options={["Approve", "Ask Sam first", "Not now"]} /> },
+    ],
+  },
 ];
 
-/** Each widget lands this many frames after the one before it. */
-const STAGGER = 20;
-const ZOOM = 1.4;
+/** Each card lands this many frames after the one before it. */
+const STAGGER = 14;
 
-/** Every widget in the kit, landing one after another with the clip's entrance and its own gesture. */
+/** Every card in the kit, landing one after another with the clip's entrance and only honest motion. */
 export function WidgetGallery() {
   const cards = useRef<(HTMLDivElement | null)[]>([]);
   const [run, setRun] = useState(0);
 
   useEffect(() => {
     readSlow();
+    const items = SECTIONS.flatMap((s) => s.items);
     const anims = cards.current.flatMap((card, i) => {
       if (!card) return [];
-      const e = widgetEntrance(12 + i * STAGGER, WIDGETS[i]?.glyph.gesture);
+      const start = 12 + i * STAGGER;
+      const e = widgetEntrance(start, items[i]?.gesture);
       return [
         playTrack(card, e.card),
-        ...Object.entries(e.parts).map(([part, t]) =>
-          playTrack(card.querySelector(`[data-part=${part}]`)!, t),
-        ),
+        ...Object.entries(e.parts).flatMap(([part, t]) => {
+          const node = card.querySelector(`[data-part=${part}]`);
+          return node ? [playTrack(node, t)] : [];
+        }),
+        ...cascade(card, start).map(([node, t]) => playTrack(node, t, "both")),
       ];
     });
     return () => anims.forEach((a) => a.cancel());
   }, [run]);
 
-  const land = (i: number) => (n: HTMLDivElement | null) => {
-    cards.current[i] = n;
-  };
-
+  let n = 0;
   return (
-    <div className="font-ios flex flex-col items-center gap-12">
-      <div className="flex flex-wrap justify-center gap-12">
-        {WIDGETS.map((w, i) => (
-          <figure key={w.name} className="flex flex-col items-center gap-4">
-            <div
-              style={{ width: WIDGET_SIZE * ZOOM, height: WIDGET_SIZE * ZOOM }}
-            >
-              <div
-                style={{
-                  transform: `scale(${ZOOM})`,
-                  transformOrigin: "0 0",
-                  width: WIDGET_SIZE,
-                }}
-              >
-                <div ref={land(i)} style={{ opacity: 0 }}>
-                  <Widget
-                    glyph={w.glyph}
-                    value={w.value}
-                    unit={w.unit}
-                    caption={w.caption}
-                  />
-                </div>
-              </div>
-            </div>
-            <figcaption className="text-[13px] text-[#8a8a8a]">
-              {w.name}
-            </figcaption>
-          </figure>
-        ))}
-      </div>
-      <figure className="flex flex-col items-center gap-4">
-        <div style={{ width: 354 * ZOOM, height: 188 * ZOOM }}>
-          <div
-            style={{
-              transform: `scale(${ZOOM})`,
-              transformOrigin: "0 0",
-              width: 354,
-            }}
-          >
-            <div ref={land(WIDGETS.length)} style={{ opacity: 0 }}>
-              <PlanCard
-                tile={{ label: "Fri", value: "12" }}
-                title="Drywall for Elm St"
-              >
-                40 sheets <Dim>from</Dim> Ridgeline <Dim>by</Dim> 10am
-                <Dim>,</Dim>
-                <br />
-                <Dim>then</Dim> Marco snaps the slip<Dim>.</Dim>
-              </PlanCard>
-            </div>
+    <div className="font-ios flex w-full max-w-[1180px] flex-col gap-14">
+      {SECTIONS.map((s) => (
+        <section key={s.title} className="flex flex-col gap-5">
+          <h2 className="text-[13px] font-medium uppercase tracking-[0.08em] text-[#8a8a8a]">{s.title}</h2>
+          <div className="flex flex-wrap items-start gap-x-8 gap-y-10">
+            {s.items.map((item) => {
+              const i = n++;
+              return (
+                <figure key={i} className="flex flex-col gap-3">
+                  <div
+                    ref={(node) => {
+                      cards.current[i] = node;
+                    }}
+                    style={{ opacity: 0 }}
+                  >
+                    {item.card}
+                  </div>
+                  <figcaption className="max-w-[354px] text-[12.5px] text-[#8a8a8a]">{item.name}</figcaption>
+                </figure>
+              );
+            })}
           </div>
-        </div>
-        <figcaption className="text-[13px] text-[#8a8a8a]">
-          Plan card: holds still, like the clip&apos;s calendar
-        </figcaption>
-      </figure>
-      <button
-        onClick={() => setRun((n) => n + 1)}
-        className="rounded-full bg-[#0c0c0c] px-5 py-2 text-[14px] text-white"
-      >
+        </section>
+      ))}
+      <button onClick={() => setRun((k) => k + 1)} className="self-center rounded-full bg-[#0c0c0c] px-5 py-2 text-[14px] text-white">
         Replay
       </button>
     </div>

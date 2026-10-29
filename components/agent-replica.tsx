@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { F, blurIn, readSlow, resample, spring, track, widgetEntrance } from "./agent-kit/motion";
-import { BELL, Dim, PlanCard, Widget } from "./agent-kit/widget";
+import { BELL, Widget } from "./agent-kit/widget";
+import { Dim, PlanCard } from "./agent-kit/cards";
 
 /*
  * A 1:1 rebuild of the "Text your agent" iPhone clip (8.45s, 60fps), from the foundations.

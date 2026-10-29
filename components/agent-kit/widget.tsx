@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, type CSSProperties, type ReactNode } from "react";
+import { useId, type CSSProperties } from "react";
 import { drop, feed, pullUp, ring, stamp, tap, type Gesture } from "./motion";
 
 /*
@@ -18,8 +18,8 @@ export const softCard: CSSProperties = {
 
 export const WIDGET_SIZE = 158;
 const RADIUS = 14.5;
-const INK = "#0c0c0c";
-const CAPTION = "#6e6e6e";
+export const INK = "#0c0c0c";
+export const CAPTION = "#6e6e6e";
 
 /*
  * Glyphs are drawn upright in one shared frame: x from about -46 to 46, the heavy part on top
@@ -174,57 +174,3 @@ export const TRUCK: GlyphShape = {
   accentSpan: [-22, -4],
   gesture: pullUp(110),
 };
-
-/* ---------- the wide card ---------- */
-
-/** Gray words in a plan card's sentence: the joining words, so the facts stand out. */
-export function Dim({ children }: { children: ReactNode }) {
-  return <span style={{ color: "#8a8a8a" }}>{children}</span>;
-}
-
-/**
- * The wide card, measured off the clip's calendar card: a small tile with a label strip and a big
- * number, a gray title beside it, a two-line sentence (facts dark, joining words in `Dim`), and one
- * blue bar per step along the bottom. It holds still: the thread's scroll is its only motion.
- */
-export function PlanCard({ tile, title, steps = 3, children }: { tile: { label: string; value: string }; title: string; steps?: number; children: ReactNode }) {
-  return (
-    <div style={{ height: 188, borderRadius: 20, position: "relative", ...softCard }}>
-      <div
-        style={{
-          position: "absolute",
-          left: 18,
-          top: 16.5,
-          width: 71,
-          height: 77,
-          borderRadius: 9,
-          overflow: "hidden",
-          background: "linear-gradient(180deg, #84b8f9 0%, #b7d6fc 100%)",
-          boxShadow: "0 2px 4px rgba(40,90,160,0.25)",
-        }}
-      >
-        <div
-          style={{
-            height: 25,
-            background: "linear-gradient(180deg, #6ba8f6, #7cb3f8)",
-            borderBottom: "1px solid rgba(60,120,200,0.35)",
-            color: "#fff",
-            fontSize: 12.5,
-            textAlign: "center",
-            lineHeight: "25px",
-          }}
-        >
-          {tile.label}
-        </div>
-        <div style={{ color: "#fff", fontSize: 40, fontWeight: 300, textAlign: "center", lineHeight: "50px", letterSpacing: -1 }}>{tile.value}</div>
-      </div>
-      <div style={{ position: "absolute", left: 102.5, top: 18, fontSize: 17, color: "#6e6e6e" }}>{title}</div>
-      <div style={{ position: "absolute", left: 18, top: 108, fontSize: 17, lineHeight: "20.5px", color: INK, letterSpacing: -0.2 }}>{children}</div>
-      <div style={{ position: "absolute", left: 18, right: 18, top: 168.5, display: "flex", gap: 4.4 }}>
-        {Array.from({ length: steps }, (_, i) => (
-          <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: "linear-gradient(180deg, #7db6fa, #9cc8fc)" }} />
-        ))}
-      </div>
-    </div>
-  );
-}
