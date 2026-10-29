@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { F, blurIn, readSlow, resample, spring, track, widgetEntrance } from "./agent-kit/motion";
+import { BELL, Widget, glyphPose, softCard } from "./agent-kit/widget";
 
 /*
  * A 1:1 rebuild of the "Text your agent" iPhone clip (8.45s, 60fps), from the foundations.
@@ -11,9 +13,6 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
  * Pure CSS + Web Animations, no libraries.
  */
 
-/** `/lab?slow=4` plays everything 4x slower, to check motion by eye. */
-let slow = 1;
-const F = (frame: number) => ((frame * 1000) / 60) * slow;
 const CYCLE = 507; // the clip is 8.45s; it loops back to frame 0
 
 const MESSAGE = "Remind me to send Sam the deck";
@@ -68,71 +67,6 @@ const SCROLL = [0, 0.02, 0.16, 0.25, 0.35, 0.44, 0.53, 0.62, 0.69, 0.76, 0.81, 0
 const SCROLL_PT = 111;
 
 const PX_PER_PT = 1.8015;
-
-/**
- * Measured tracks are one sample per clip frame. Played as straight lines between samples they
- * read as steppy on 120Hz screens, so fill each frame with a Catmull-Rom curve through the samples.
- */
-function resample(points: [frame: number, ...values: number[]][], perFrame = 4): [number, ...number[]][] {
-  const out: [number, ...number[]][] = [];
-  for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[Math.max(0, i - 1)];
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    const p3 = points[Math.min(points.length - 1, i + 2)];
-    const steps = Math.max(1, Math.round((p2[0] - p1[0]) * perFrame));
-    for (let s = 0; s < steps; s++) {
-      const t = s / steps;
-      const t2 = t * t;
-      const t3 = t2 * t;
-      const v = (k: number) =>
-        0.5 * (2 * p1[k] + (-p0[k] + p2[k]) * t + (2 * p0[k] - 5 * p1[k] + 4 * p2[k] - p3[k]) * t2 + (-p0[k] + 3 * p1[k] - 3 * p2[k] + p3[k]) * t3);
-      out.push(p1.map((_, k) => (k === 0 ? p1[0] + (p2[0] - p1[0]) * t : v(k))) as [number, ...number[]]);
-    }
-  }
-  out.push(points[points.length - 1]);
-  return out;
-}
-
-/**
- * Damped spring from 0 to 1 sampled per frame, for the pieces the clip shows settling with a small bounce.
- * `velocity` (per second) gives it the head start that makes it snap out instead of easing in.
- */
-function spring(frames: number, { stiffness = 320, damping = 22, velocity = 0 } = {}) {
-  const dt = 1 / 240;
-  let x = 0;
-  let v = velocity;
-  const out: number[] = [];
-  for (let i = 0; i <= frames * 4; i++) {
-    if (i % 4 === 0) out.push(x);
-    const a = stiffness * (1 - x) - damping * v;
-    v += a * dt;
-    x += v * dt;
-  }
-  out[out.length - 1] = 1;
-  return out;
-}
-
-/** Keyframes with offsets from absolute frame numbers. */
-function track<T extends Record<string, string | number>>(points: [number, T][]) {
-  const start = points[0][0];
-  const end = points[points.length - 1][0];
-  return {
-    keyframes: points.map(([f, k]) => ({ ...k, offset: (f - start) / (end - start) })),
-    delay: F(start),
-    duration: F(end - start),
-  };
-}
-
-/** Blur-in used by the send button, the dots, the reply and the card. */
-function blurIn(points: [frame: number, blur: number, opacity: number, scale?: number][]) {
-  return track(
-    points.map(([f, blur, opacity, scale = 1]) => [
-      f,
-      { filter: `blur(${blur}px)`, opacity, transform: `scale(${scale})` },
-    ]),
-  );
-}
 
 /* ---------- pieces ---------- */
 
@@ -209,12 +143,6 @@ function Them({
   );
 }
 
-const softCard: CSSProperties = {
-  background: "#f7f7f7",
-  border: "1px solid #ececec",
-  boxShadow: "0 1px 2px rgba(0,0,0,0.03), 0 6px 16px rgba(0,0,0,0.04)",
-};
-
 function CalendarCard() {
   const gray = { color: "#8a8a8a" };
   return (
@@ -259,72 +187,6 @@ function CalendarCard() {
           <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: "linear-gradient(180deg, #7db6fa, #9cc8fc)" }} />
         ))}
       </div>
-    </div>
-  );
-}
-
-/**
- * The bell, traced from the clip and mirror-filled where the card edge cuts it. Drawn upright around
- * the clapper's centre: 92pt across the flared rim, a round dome, a half-disc clapper 5pt below.
- * The card holds it tilted 24deg with the clapper at (91.5, 74.1); the dome runs off the card's top.
- */
-const BELL_BODY =
-  "M-39.5 -11.8 C-43.5 -11.8 -46.2 -14.5 -46 -17.8 C-44 -23 -36 -27 -35.5 -34 L-35.5 -52.5 " +
-  "A35.5 35.5 0 0 1 35.5 -52.5 L35.5 -34 C36 -27 44 -23 46 -17.8 C46.2 -14.5 43.5 -11.8 39.5 -11.8 Z";
-
-/** Where the bell hangs from when it rings: up in the dome, on its axis. */
-const BELL_PIVOT = -60;
-const bellPose = (swing: number) =>
-  `translate(91.5px, 74.1px) rotate(24deg) translate(0px, ${BELL_PIVOT}px) rotate(${swing.toFixed(2)}deg) translate(0px, ${-BELL_PIVOT}px)`;
-
-function Bell({ innerRef }: { innerRef?: React.Ref<SVGGElement> }) {
-  return (
-    <svg width="158" height="158" viewBox="0 0 158 158" aria-hidden="true" style={{ position: "absolute", left: 0, top: 0 }}>
-      <defs>
-        <linearGradient id="bell-g" gradientUnits="userSpaceOnUse" x1="0" y1="-88" x2="0" y2="-12">
-          <stop offset="0" stopColor="#6aa9fa" />
-          <stop offset="0.9" stopColor="#a8ccfb" />
-          <stop offset="1" stopColor="#b0d1fb" />
-        </linearGradient>
-        <linearGradient id="clap-g" gradientUnits="userSpaceOnUse" x1="0" y1="-6.3" x2="0" y2="7.8">
-          <stop offset="0" stopColor="#70acfb" />
-          <stop offset="1" stopColor="#a4cafb" />
-        </linearGradient>
-      </defs>
-      <g ref={innerRef} style={{ transform: bellPose(0), transformBox: "view-box", transformOrigin: "0 0" }}>
-        <path d={BELL_BODY} fill="url(#bell-g)" />
-        <path d="M-14.1 -6.3 A14.1 14.1 0 0 0 14.1 -6.3 Z" fill="url(#clap-g)" />
-      </g>
-    </svg>
-  );
-}
-
-/**
- * The bell's ring, as its swing (deg, clockwise) at each turning point. Held lifted while the card
- * blurs in, let go on 386, then about 13 frames per swing, dying out by 489.
- */
-const RING: [frame: number, swing: number][] = [
-  [378, 7.4],
-  [386, 7.4],
-  [398.5, -7.1],
-  [411.5, 4.1],
-  [424.5, -4],
-  [437, 2],
-  [450, -1],
-  [463, 0.5],
-  [476, -0.2],
-  [489, 0],
-];
-
-function ReminderCard({ bellRef }: { bellRef?: React.Ref<SVGGElement> }) {
-  return (
-    <div style={{ width: 158, height: 158, borderRadius: 14.5, position: "relative", overflow: "hidden", ...softCard }}>
-      <Bell innerRef={bellRef} />
-      <div style={{ position: "absolute", left: 20, top: 74, display: "flex", alignItems: "baseline", gap: 3, color: "#0c0c0c" }}>
-        <span style={{ fontSize: 42, lineHeight: "42px", letterSpacing: -1 }}>4</span>
-        <span style={{ fontSize: 16 }}>PM</span>
-      </div>
-      <div style={{ position: "absolute", left: 20, top: 122, fontSize: 12.5, color: "#6e6e6e" }}>Thu - Deck to Sam</div>
     </div>
   );
 }
@@ -611,25 +473,19 @@ export function AgentReplica() {
 
       // The reminder card lands and the thread scrolls it into view.
       at(378, () => show(el.card));
-      play(el.card, blurIn([[378, 14, 0.2], [382, 6, 0.6], [385, 1, 0.95], [387, 0, 1]]));
+      // The reminder widget lands: the card blurs in and its bell rings.
+      const widget = widgetEntrance(378, glyphPose);
+      play(el.card, widget.card);
       play(
         el.content,
         track(resample(SCROLL.map((p, i) => [380 + i, p])).map(([f, p]) => [f, { transform: `translateY(${(-p * SCROLL_PT).toFixed(2)}px)` }])),
       );
-      // The bell rings: each swing eases out of one turning point and into the next, like a pendulum.
-      const ring: [number, { transform: string }][] = [];
-      RING.forEach(([f0, a0], i) => {
-        const next = RING[i + 1];
-        if (!next) return ring.push([f0, { transform: bellPose(a0) }]);
-        const [f1, a1] = next;
-        for (let f = f0; f < f1; f += 0.25) ring.push([f, { transform: bellPose(a0 + ((a1 - a0) * (1 - Math.cos((Math.PI * (f - f0)) / (f1 - f0)))) / 2) }]);
-      });
-      play(el.bell, track(ring));
+      play(el.bell, widget.glyph);
 
       at(CYCLE, () => run());
     }
 
-    slow = Math.max(1, Number(new URLSearchParams(location.search).get("slow")) || 1);
+    readSlow();
     run();
     (window as unknown as { __agentSeek?: (f?: number) => void }).__agentSeek = (f) => (f === undefined ? run() : run(f, true));
     return () => {
@@ -720,7 +576,7 @@ export function AgentReplica() {
                   </div>
                 </div>
                 <div ref={r.card} style={{ marginTop: 13.5, paddingLeft: 20 }}>
-                  <ReminderCard bellRef={r.bell} />
+                  <Widget glyph={BELL} value="4" unit="PM" caption="Thu - Deck to Sam" glyphRef={r.bell} />
                 </div>
               </div>
 
