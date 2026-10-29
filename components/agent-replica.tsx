@@ -440,7 +440,10 @@ export function AgentReplica() {
       // The reminder widget lands: the card blurs in and its bell rings.
       const widget = widgetEntrance(378, BELL.gesture);
       play(el.card, widget.card);
-      for (const [part, t] of Object.entries(widget.parts)) play(el.card.querySelector(`[data-part=${part}]`)!, t);
+      for (const [part, t] of Object.entries(widget.parts)) {
+        const node = el.card.querySelector(`[data-part=${part}]`);
+        if (node) play(node, t);
+      }
       play(
         el.content,
         track(resample(SCROLL.map((p, i) => [380 + i, p])).map(([f, p]) => [f, { transform: `translateY(${(-p * SCROLL_PT).toFixed(2)}px)` }])),

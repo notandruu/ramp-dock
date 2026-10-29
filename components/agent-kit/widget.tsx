@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, type CSSProperties, type ReactNode } from "react";
-import { drop, feed, ring, type Gesture } from "./motion";
+import { drop, feed, pullUp, ring, stamp, tap, type Gesture } from "./motion";
 
 /*
  * The in-thread widget, measured off the reminder card in the "Text your agent" clip. Sizes are
@@ -70,7 +70,7 @@ export function Glyph({ shape }: { shape: GlyphShape }) {
     <svg width={WIDGET_SIZE} height={WIDGET_SIZE} viewBox={`0 0 ${WIDGET_SIZE} ${WIDGET_SIZE}`} aria-hidden="true" style={{ position: "absolute", left: 0, top: 0 }}>
       <GlyphPaint id={id} accentSpan={shape.accentSpan} />
       <g data-part="glyph" style={{ transform: glyphPose(0), transformBox: "view-box", transformOrigin: "0 0" }}>
-        <path data-part="body" d={shape.body} fill={`url(#${id}-body)`} fillRule="evenodd" />
+        <path data-part="body" d={shape.body} fill={`url(#${id}-body)`} fillRule="evenodd" style={{ transformBox: "fill-box", transformOrigin: "center" }} />
         {shape.accent && (
           <path data-part="accent" d={shape.accent} fill={`url(#${id}-accent)`} style={{ transformBox: "fill-box", transformOrigin: "center" }} />
         )}
@@ -124,26 +124,55 @@ export const BELL: GlyphShape = {
   gesture: ring(glyphPose),
 };
 
-/** A delivery box with a strip of tape, sitting on a small pallet as the accent. */
+/** A card, face on: chip and name line cut out. Tapped like paying at a reader. */
+export const CARD: GlyphShape = {
+  body:
+    "M-35 -68 L35 -68 Q42 -68 42 -61 L42 -21 Q42 -14 35 -14 L-35 -14 Q-42 -14 -42 -21 L-42 -61 Q-42 -68 -35 -68 Z " +
+    "M-29 -52 L-17 -52 Q-15 -52 -15 -50 L-15 -42 Q-15 -40 -17 -40 L-29 -40 Q-31 -40 -31 -42 L-31 -50 Q-31 -52 -29 -52 Z " +
+    "M-29 -27 L-1 -27 Q1 -27 1 -25 Q1 -23 -1 -23 L-29 -23 Q-31 -23 -31 -25 Q-31 -27 -29 -27 Z",
+  gesture: tap(0.1),
+};
+
+/** A shipping box in three-quarter view: top and two sides, a thin gap at each fold. Dropped into place. */
 export const BOX: GlyphShape = {
   body:
-    "M-28 -84 L28 -84 Q34 -84 34 -78 L34 -20 Q34 -14 28 -14 L-28 -14 Q-34 -14 -34 -20 L-34 -78 Q-34 -84 -28 -84 Z " +
-    "M-7 -84 L7 -84 L7 -62 Q7 -60 5 -60 L-5 -60 Q-7 -60 -7 -62 Z",
-  accent: "M-20 -8 L20 -8 Q24 -8 24 -4 Q24 0 20 0 L-20 0 Q-24 0 -24 -4 Q-24 -8 -20 -8 Z",
-  accentSpan: [-8, 0],
+    "M0 -88 L40 -70 L0 -55 L-40 -70 Z " +
+    "M-40 -67 L-1.5 -52.6 L-1.5 -12.6 L-40 -27 Z " +
+    "M40 -67 L1.5 -52.6 L1.5 -12.6 L40 -27 Z",
   gesture: drop(16),
 };
 
-/** A paid bill: a slip with a torn bottom edge and two lines, and the coin that says it is paid. */
+/** A paid bill: a slip with a torn bottom edge and two lines. It prints out of the corner. */
 export const BILL: GlyphShape = {
   body:
     "M-30 -88 L30 -88 Q36 -88 36 -82 L36 -12 L30 -17 L24 -12 L18 -17 L12 -12 L6 -17 L0 -12 L-6 -17 L-12 -12 " +
     "L-18 -17 L-24 -12 L-30 -17 L-36 -12 L-36 -82 Q-36 -88 -30 -88 Z " +
     "M-22 -46 L22 -46 Q24 -46 24 -44 L24 -41 Q24 -39 22 -39 L-22 -39 Q-24 -39 -24 -41 L-24 -44 Q-24 -46 -22 -46 Z " +
     "M-22 -32 L8 -32 Q10 -32 10 -30 L10 -27 Q10 -25 8 -25 L-22 -25 Q-24 -25 -24 -27 L-24 -30 Q-24 -32 -22 -32 Z",
-  accent: "M0 -6 A10 10 0 1 1 0 14 A10 10 0 1 1 0 -6 Z",
-  accentSpan: [-6, 14],
   gesture: feed(40),
+};
+
+/** An approval stamp: knob, neck, handle and rubber pad. Its accent is the ink line it leaves. */
+export const STAMP: GlyphShape = {
+  body:
+    "M0 -88 A13 13 0 1 1 0 -62 A13 13 0 1 1 0 -88 Z " +
+    "M-7 -60 L7 -60 L12 -42 L-12 -42 Z " +
+    "M-35 -40 L35 -40 Q40 -40 40 -35 L40 -31 Q40 -26 35 -26 L-35 -26 Q-40 -26 -40 -31 L-40 -35 Q-40 -40 -35 -40 Z " +
+    "M-34 -23.5 L34 -23.5 L34 -15 Q34 -13 32 -13 L-32 -13 Q-34 -13 -34 -15 Z",
+  accent: "M-32 -7 L32 -7 Q35 -7 35 -4 Q35 -1 32 -1 L-32 -1 Q-35 -1 -35 -4 Q-35 -7 -32 -7 Z",
+  accentSpan: [-7, -1],
+  gesture: stamp(14),
+};
+
+/** A delivery truck facing left: cab with a window, the cargo box, wheels as the accent. It pulls up. */
+export const TRUCK: GlyphShape = {
+  body:
+    "M-46 -38 L-37 -54 Q-35 -57 -32 -57 L-19 -57 L-19 -20 L-43 -20 Q-46 -20 -46 -23 Z " +
+    "M-41 -40 L-35 -51 L-24 -51 L-24 -40 Z " +
+    "M-15 -72 L42 -72 Q46 -72 46 -68 L46 -24 Q46 -20 42 -20 L-15 -20 Z",
+  accent: "M-30 -22 A9 9 0 1 1 -30 -4 A9 9 0 1 1 -30 -22 Z M30 -22 A9 9 0 1 1 30 -4 A9 9 0 1 1 30 -22 Z",
+  accentSpan: [-22, -4],
+  gesture: pullUp(110),
 };
 
 /* ---------- the wide card ---------- */

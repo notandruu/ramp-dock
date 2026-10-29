@@ -2,50 +2,20 @@
 
 import { useEffect, useRef, useState } from "react";
 import { playTrack, readSlow, widgetEntrance } from "./motion";
-import {
-  BELL,
-  BILL,
-  BOX,
-  Dim,
-  PlanCard,
-  Widget,
-  WIDGET_SIZE,
-  type GlyphShape,
-} from "./widget";
+import { BELL, BILL, BOX, CARD, Dim, PlanCard, STAMP, TRUCK, Widget, WIDGET_SIZE, type GlyphShape } from "./widget";
 
-const WIDGETS: {
-  name: string;
-  glyph: GlyphShape;
-  value: string;
-  unit?: string;
-  caption: string;
-}[] = [
-  {
-    name: "Reminder: rings",
-    glyph: BELL,
-    value: "4",
-    unit: "PM",
-    caption: "Thu - Deck to Sam",
-  },
-  {
-    name: "Delivery: drops onto the pallet",
-    glyph: BOX,
-    value: "40",
-    unit: "sheets",
-    caption: "Drywall - Elm St",
-  },
-  {
-    name: "Bills paid: prints, then the coin",
-    glyph: BILL,
-    value: "3",
-    unit: "paid",
-    caption: "Bills - $8,410 in all",
-  },
+const WIDGETS: { name: string; glyph: GlyphShape; value: string; unit?: string; caption: string }[] = [
+  { name: "Reminder: the bell rings", glyph: BELL, value: "4", unit: "PM", caption: "Thu - Deck to Sam" },
+  { name: "Card: tapped like at a reader", glyph: CARD, value: "$60", caption: "Dana - Tools" },
+  { name: "Bill paid: prints out", glyph: BILL, value: "3", unit: "paid", caption: "Bills - $8,410 in all" },
+  { name: "Approved: stamped", glyph: STAMP, value: "OK", caption: "Laptop for Priya" },
+  { name: "Delivered: box dropped in", glyph: BOX, value: "40", unit: "sheets", caption: "Drywall - Elm St" },
+  { name: "On the way: truck pulls up", glyph: TRUCK, value: "10", unit: "AM", caption: "Ridgeline - Elm St" },
 ];
 
 /** Each widget lands this many frames after the one before it. */
-const STAGGER = 30;
-const ZOOM = 1.6;
+const STAGGER = 20;
+const ZOOM = 1.4;
 
 /** Every widget in the kit, landing one after another with the clip's entrance and its own gesture. */
 export function WidgetGallery() {
